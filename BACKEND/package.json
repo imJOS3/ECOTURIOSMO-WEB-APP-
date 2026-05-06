@@ -1,15 +1,19 @@
-
 {
   "name": "backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-
-  
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
+
+  "jest": {
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "globalTeardown": "<rootDir>/tests/teardown.js"
+  },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -20,11 +24,13 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "helmet": "^8.1.0",
+    "jest": "^30.3.0",
     "joi": "^18.1.2",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
     "pg": "^8.20.0",
-    "redis": "^5.12.1"
+    "redis": "^5.12.1",
+    "supertest": "^7.2.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

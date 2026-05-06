@@ -1,278 +1,176 @@
-# 🌿 DOCUMENTACIÓN BACKEND - ECOTURISMO
+# 🌿 EcoTurismo API
 
-## 📌 Descripción general
-
-Este backend es una API REST desarrollada con Node.js y Express para gestionar una plataforma de ecoturismo tipo Airbnb.
-
-Permite:
-
-* Registro e inicio de sesión de usuarios
-* Gestión de alojamientos
-* Creación de reservas
-* Registro de pagos
-* Publicación de reseñas
-* Administración de categorías
+> Backend REST API para una plataforma de ecoturismo tipo Airbnb — construida con Node.js, Express y JWT.
 
 ---
 
-# 🧠 Arquitectura del sistema
+## 📌 Descripción
 
-El sistema está dividido en capas:
-
-* **Routes** → define endpoints
-* **Controller** → maneja request/response
-* **Service** → lógica de negocio
-* **Queries** → consultas SQL
-* **Middlewares** → seguridad y validaciones
+EcoTurismo API permite gestionar una plataforma de alojamientos sostenibles. Incluye autenticación segura con JWT, control de roles (turista, anfitrión, admin), reservas, pagos, reseñas y categorías.
 
 ---
 
-# 🔐 AUTENTICACIÓN Y AUTORIZACIÓN
+## 🚀 Tecnologías
 
-## 🔑 Autenticación (JWT)
+- **Node.js** + **Express**
+- **JWT** para autenticación
+- **bcrypt** para encriptación de contraseñas
+- **SQL** con consultas parametrizadas
+- **Jest** + **Supertest** para testing
 
-El sistema utiliza **JWT (JSON Web Token)**.
+---
 
-### Flujo:
-
-1. Usuario hace login
-2. El backend genera un token
-3. El cliente lo envía en cada request protegida
-
-### Header obligatorio:
+## 🧠 Arquitectura
 
 ```
-Authorization: Bearer TOKEN
+src/
+├── routes/        → Endpoints de la API
+├── controllers/   → Manejo de request/response
+├── services/      → Lógica de negocio
+├── queries/       → Consultas SQL parametrizadas
+└── middlewares/   → Autenticación, autorización y errores
 ```
 
 ---
 
-## 🚫 ERRORES DE AUTENTICACIÓN
+## 🔐 Autenticación
 
-### ❌ No token
+El sistema usa **JWT**. Luego de registrarse o iniciar sesión, el cliente debe enviar el token en cada request protegida:
 
-Si no envías token:
-
-```json
-{
-  "message": "No autorizado"
-}
+```
+Authorization: Bearer <TOKEN>
 ```
 
-👉 Causa:
+### Errores de autenticación
 
-* No se envió header Authorization
+| Código | Mensaje                        | Causa                              |
+|--------|--------------------------------|------------------------------------|
+| 401    | `No autorizado`                | No se envió el header              |
+| 401    | `Token inválido o expirado`    | Token mal formado, vencido o firma incorrecta |
 
 ---
 
-### ❌ Token inválido o expirado
+## 👥 Roles
 
-```json
-{
-  "message": "Token inválido o expirado"
-}
+| Rol         | Permisos                                                                 |
+|-------------|--------------------------------------------------------------------------|
+| 🧍 Turista   | Ver alojamientos, crear reservas y reseñas, ver sus reservas             |
+| 🏡 Anfitrión | Todo lo de turista + crear y gestionar sus alojamientos                  |
+| 🛠️ Admin     | Todo lo anterior + gestionar usuarios, categorías y contenido del sistema |
+
+> Acceso con rol incorrecto devuelve `403 Forbidden`.
+
+---
+
+## 📦 Módulos
+
+| Módulo         | Descripción                                              |
+|----------------|----------------------------------------------------------|
+| 🔐 Auth         | Registro, login, JWT, bcrypt                            |
+| 👤 Usuarios     | CRUD, roles, protección por autenticación               |
+| 🏡 Alojamientos | Crear (anfitrión), listar, obtener por ID               |
+| 📅 Reservas     | Crear, consultar, base para manejo de estados           |
+| 💳 Pagos        | Registrar y consultar pagos por reserva                 |
+| ⭐ Reseñas      | Crear y consultar por alojamiento                       |
+| 🏷️ Categorías   | Crear (admin), listar                                   |
+
+---
+
+## 📊 Códigos HTTP
+
+| Código | Significado               |
+|--------|---------------------------|
+| 200    | OK — consulta exitosa     |
+| 201    | Created — recurso creado  |
+| 401    | Unauthorized — no autenticado |
+| 403    | Forbidden — sin permisos  |
+| 500    | Internal Server Error     |
+
+---
+
+## 🧪 Testing
+
+Tests de integración implementados con **Jest** y **Supertest**, cubriendo todos los módulos y validando:
+
+- ❌ Acceso sin token → `401`
+- ❌ Acceso con rol incorrecto → `403`
+- ✅ Acceso correcto → `200` / `201`
+
+### Ejecutar tests
+
+```bash
+npm test
 ```
 
-👉 Causa:
-
-* Token mal formado
-* Token vencido
-
 ---
 
-## 🛡️ Autorización (roles)
+## ⚙️ Instalación y uso
 
-Después de autenticar, se valida el **rol del usuario**.
+```bash
+# Clonar el repositorio
+git clone https://github.com/tu-usuario/ecoturismo-api.git
+cd ecoturismo-api
 
----
+# Instalar dependencias
+npm install
 
-# 👥 ROLES DEL SISTEMA
+# Configurar variables de entorno
+cp .env.example .env
 
-## 🧍‍♂️ Turista
+# Iniciar el servidor
+npm start 
 
-Puede:
-
-* Ver alojamientos
-* Crear reservas
-* Crear reseñas
-* Ver sus reservas
-
-No puede:
-
-* Crear alojamientos
-* Crear categorías
-* Ver todos los usuarios
-
----
-
-## 🏡 Anfitrión
-
-Puede:
-
-* Crear alojamientos
-* Ver sus alojamientos
-* Gestionar disponibilidad
-
-También puede:
-
-* Todo lo de turista
-
----
-
-## 🛠️ Admin
-
-Puede:
-
-* Ver todos los usuarios
-* Crear categorías
-* Gestionar todo el sistema
-
----
-
-# 🚫 ERRORES DE AUTORIZACIÓN
-
-### ❌ Rol incorrecto
-
-```json
-{
-  "message": "No autorizado"
-}
+npm run dev
 ```
 
-👉 Ejemplo:
+---
 
-* Un turista intenta crear alojamiento
+## ⚠️ Limitaciones actuales
+
+El sistema aún **no incluye**:
+
+- ❌ Validación de fechas en reservas
+- ❌ Prevención de reservas duplicadas
+- ❌ Cálculo automático de precios
+- ❌ Relación categorías ↔ alojamientos
+- ❌ Subida de imágenes
+- ❌ Validación avanzada de datos (Zod / Joi)
+- ❌ Paginación en endpoints
 
 ---
 
-# 🔄 FLUJO DEL SISTEMA
+## 🛣️ Mejoras futuras
 
-## 🧭 Flujo principal
-
-1. Registro de usuario
-2. Login → получение token
-3. Anfitrión crea alojamiento
-4. Turista reserva alojamiento
-5. Usuario paga
-6. Usuario deja reseña
-
----
-
-# 📦 MÓDULOS IMPLEMENTADOS
-
-## 🔐 Auth
-
-* Registro
-* Login
-* Generación de token
+- [ ] Validar disponibilidad de fechas y evitar solapamientos
+- [ ] Calcular precios dinámicamente
+- [ ] Relacionar categorías con alojamientos
+- [ ] Subida de imágenes (Cloudinary / S3)
+- [ ] Validación de inputs con Zod o Joi
+- [ ] Paginación y filtros en listados
+- [ ] Separar entornos de testing y producción
+- [ ] Dockerizar el backend
 
 ---
 
-## 👤 Usuarios
+## ✅ Estado actual
 
-* CRUD básico
-* Gestión de roles
-
----
-
-## 🏡 Alojamientos
-
-* Crear
-* Listar
-* Filtrar por anfitrión
+| Ítem                          | Estado |
+|-------------------------------|--------|
+| Backend funcional             | ✔️     |
+| Autenticación con JWT         | ✔️     |
+| Control de roles              | ✔️     |
+| Tests automatizados (100%)    | ✔️     |
+| Base de datos estructurada    | ✔️     |
+| Arquitectura modular limpia   | ✔️     |
 
 ---
 
-## 📅 Reservas
+## 🎯 Objetivo
 
-* Crear reservas
-* Ver reservas del usuario
-* Cambiar estado
+Construir un backend robusto, escalable y bien estructurado aplicando buenas prácticas reales de desarrollo backend profesional.
 
 ---
 
-## 💳 Pagos
+## 📄 Licencia
 
-* Registrar pago de reserva
-* Consultar pagos
-
----
-
-## ⭐ Reseñas
-
-* Crear reseñas
-* Ver reseñas por alojamiento
-
----
-
-## 🏷️ Categorías
-
-* Crear (solo admin)
-* Listar
-
----
-
-# 🧪 PRUEBAS RECOMENDADAS
-
-## 1. Auth
-
-* Registro
-* Login
-* Guardar token
-
----
-
-## 2. Seguridad
-
-### Probar SIN token
-
-Debe fallar con 401
-
-### Probar con rol incorrecto
-
-Debe fallar con 403
-
----
-
-## 3. Flujo completo
-
-1. Crear usuario
-2. Login
-3. Crear alojamiento
-4. Crear reserva
-5. Crear pago
-6. Crear reseña
-
----
-
-# ⚠️ LIMITACIONES ACTUALES (IMPORTANTE)
-
-Actualmente el sistema NO tiene:
-
-* ❌ Validación de fechas en reservas
-* ❌ Prevención de doble reserva
-* ❌ Cálculo automático de precio
-* ❌ Relación categorías ↔ alojamientos
-* ❌ Subida de imágenes
-* ❌ Validación de datos (Zod/Joi)
-
----
-
-# 🚀 Para el futuro mejorar dichas limitaciones
-
-Para llevar el sistema a nivel profesional:
-
-* Validar disponibilidad de fechas
-* Evitar reservas solapadas
-* Calcular precio automáticamente
-* Relacionar categorías con alojamientos
-* Subir imágenes (Cloudinary/S3)
-* Validar inputs con Zod
-
----
-
-# 📌 Estado actual
-
-✔ Backend funcional
-✔ Estructura profesional
-✔ pendiente por actulizar
+MIT

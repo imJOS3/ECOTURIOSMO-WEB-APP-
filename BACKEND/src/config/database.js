@@ -1,4 +1,9 @@
 import pkg from 'pg';
+
+import dotenv from 'dotenv';
+
+//carga las variables de entorno desde el archivo .env
+dotenv.config();
 const { Pool } = pkg;
 
 const pool = new Pool({
