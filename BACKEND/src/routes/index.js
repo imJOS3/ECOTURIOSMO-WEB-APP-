@@ -14,7 +14,7 @@ import unidadRoutes from '../modules/unidades/unidad.routes.js';
 const router = Router();
 
 // agrupar rutas
-router.use('/api/unidades', unidadRoutes);
+router.use('/unidades', unidadRoutes);
 router.use('/auth', authRoutes);
 router.use('/usuarios', usuarioRoutes);
 router.use('/alojamientos', alojamientoRoutes);

@@ -5,7 +5,6 @@ export const createAlojamientoSchema = Joi.object({
 
   descripcion: Joi.string().min(10).required(),
 
-  precio: Joi.number().positive().required(),
 
   ubicacion: Joi.string().required(),
 

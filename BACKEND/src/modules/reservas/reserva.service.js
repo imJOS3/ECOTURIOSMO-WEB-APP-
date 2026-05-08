@@ -2,63 +2,101 @@ import pool from '../../config/database.js';
 import * as q from './reserva.queries.js';
 
 export const create = async (data, user) => {
+
   const {
-    id_alojamiento,
+    id_unidad,
     fecha_inicio,
-    fecha_fin,
-    total
+    fecha_fin
   } = data;
 
-  // ✅ Check if accommodation is available
-  const availability = await pool.query(
-    q.checkAvailability,
-    [id_alojamiento, fecha_inicio, fecha_fin]
-  );
+  // ✅ validar fechas
+  const inicio = new Date(fecha_inicio);
+  const fin = new Date(fecha_fin);
 
-  // ❌ If dates overlap
-  if (availability.rows.length > 0) {
+  if (inicio >= fin) {
     throw {
-      status: 409,
-      message: 'Accommodation is not available for these dates'
+      status: 400,
+      message: 'Invalid reservation dates'
     };
   }
 
-  // ✅ Create reservation
-  const { rows } = await pool.query(q.createReserva, [
+  // ✅ obtener unidad
+  const unidadResult = await pool.query(
+    q.getUnidadById,
+    [id_unidad]
+  );
+
+  const unidad = unidadResult.rows[0];
+
+  if (!unidad) {
+    throw {
+      status: 404,
+      message: 'Unit not found'
+    };
+  }
+
+  // ✅ validar disponible
+  if (!unidad.disponible) {
+    throw {
+      status: 400,
+      message: 'Unit not available'
+    };
+  }
+
+  // 🔒 UNIDAD PRIVADA
+  if (!unidad.es_compartido) {
+
+    const overlap = await pool.query(
+      q.checkReservaOverlap,
+      [id_unidad, fecha_inicio, fecha_fin]
+    );
+
+    if (overlap.rows.length > 0) {
+      throw {
+        status: 400,
+        message: 'Unit already reserved for these dates'
+      };
+    }
+  }
+
+  // 👥 UNIDAD COMPARTIDA
+  else {
+
+    const reservasActivas = await pool.query(
+      q.countReservasActivas,
+      [id_unidad, fecha_inicio, fecha_fin]
+    );
+
+    const totalReservas =
+      parseInt(reservasActivas.rows[0].total);
+
+    if (totalReservas >= unidad.capacidad) {
+      throw {
+        status: 400,
+        message: 'No spots available'
+      };
+    }
+  }
+
+  // ✅ calcular noches
+  const noches =
+    (fin - inicio) / (1000 * 60 * 60 * 24);
+
+  // ✅ calcular total automático
+  const total =
+    noches * unidad.precio_noche;
+
+  // ✅ crear reserva
+const { rows } = await pool.query(
+  q.createReserva,
+  [
     user.id,
-    id_alojamiento,
+    id_unidad,
     fecha_inicio,
     fecha_fin,
     total
-  ]);
+  ]
+);
 
   return rows[0];
-};
-
-export const getAll = async () => {
-  const { rows } = await pool.query(q.getReservas);
-  return rows;
-};
-
-export const getById = async (id) => {
-  const { rows } = await pool.query(q.getReservaById, [id]);
-  return rows[0];
-};
-
-export const getMine = async (user) => {
-  const { rows } = await pool.query(q.getReservasByUser, [user.id]);
-  return rows;
-};
-
-export const update = async (id, estado) => {
-  const { rows } = await pool.query(q.updateReserva, [estado, id]);
-  return rows[0];
-};
-
-export const remove = async (id) => {
-  await pool.query(q.deleteReserva, [id]);
-
-  return {
-    message: 'Reserva eliminada'
-  };
 };

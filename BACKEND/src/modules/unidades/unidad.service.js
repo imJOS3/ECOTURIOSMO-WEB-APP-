@@ -8,8 +8,13 @@ export const create = async (data) => {
     tipo,
     descripcion,
     capacidad,
+    es_compartido,
     precio_noche
   } = data;
+
+  // inicialmente los cupos disponibles
+  // son iguales a la capacidad
+  const cupos_disponibles = capacidad;
 
   const { rows } = await pool.query(q.createUnidad, [
     id_alojamiento,
@@ -17,6 +22,8 @@ export const create = async (data) => {
     tipo,
     descripcion,
     capacidad,
+    cupos_disponibles,
+    es_compartido,
     precio_noche
   ]);
 

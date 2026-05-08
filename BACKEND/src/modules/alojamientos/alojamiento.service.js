@@ -2,13 +2,18 @@ import pool from '../../config/database.js';
 import * as q from './alojamiento.queries.js';
 
 export const create = async (data, user) => {
-  const { titulo, descripcion, precio, ubicacion, latitud, longitud } = data;
+  const {
+    titulo,
+    descripcion,
+    ubicacion,
+    latitud,
+    longitud
+  } = data;
 
   const { rows } = await pool.query(q.createAlojamiento, [
     user.id,
     titulo,
     descripcion,
-    precio,
     ubicacion,
     latitud,
     longitud
@@ -33,13 +38,20 @@ export const getMyAlojamientos = async (user) => {
 };
 
 export const update = async (id, data) => {
-  const { titulo, descripcion, precio, ubicacion } = data;
+  const {
+    titulo,
+    descripcion,
+    ubicacion,
+    latitud,
+    longitud
+  } = data;
 
   const { rows } = await pool.query(q.updateAlojamiento, [
     titulo,
     descripcion,
-    precio,
     ubicacion,
+    latitud,
+    longitud,
     id
   ]);
 
@@ -48,5 +60,6 @@ export const update = async (id, data) => {
 
 export const remove = async (id) => {
   await pool.query(q.deleteAlojamiento, [id]);
+
   return { message: 'Eliminado' };
 };
