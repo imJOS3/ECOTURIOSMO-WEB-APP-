@@ -8,11 +8,13 @@ import reservaRoutes from '../modules/reservas/reserva.routes.js';
 import pagoRoutes from '../modules/pagos/pago.routes.js';
 import resenaRoutes from '../modules/resenas/resena.routes.js';
 import categoriaRoutes from '../modules/categorias/categoria.routes.js';
+import unidadRoutes from '../modules/unidades/unidad.routes.js';
 // luego agregas reservas, pagos, etc.
 
 const router = Router();
 
 // agrupar rutas
+router.use('/api/unidades', unidadRoutes);
 router.use('/auth', authRoutes);
 router.use('/usuarios', usuarioRoutes);
 router.use('/alojamientos', alojamientoRoutes);

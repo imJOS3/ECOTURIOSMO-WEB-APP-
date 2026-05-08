@@ -54,7 +54,7 @@ Authorization: Bearer <TOKEN>
 
 | Rol         | Permisos                                                                 |
 |-------------|--------------------------------------------------------------------------|
-| 🧍 Turista   | Ver alojamientos, crear reservas y reseñas, ver sus reservas             |
+| 🧍 Turista   | Ver alojamientos, crear reservas y reseñas, ver sus reservas, pagar             |
 | 🏡 Anfitrión | Todo lo de turista + crear y gestionar sus alojamientos                  |
 | 🛠️ Admin     | Todo lo anterior + gestionar usuarios, categorías y contenido del sistema |
 
@@ -129,8 +129,7 @@ npm run dev
 
 El sistema aún **no incluye**:
 
-- ❌ Validación de fechas en reservas
-- ❌ Prevención de reservas duplicadas
+
 - ❌ Cálculo automático de precios
 - ❌ Relación categorías ↔ alojamientos
 - ❌ Subida de imágenes

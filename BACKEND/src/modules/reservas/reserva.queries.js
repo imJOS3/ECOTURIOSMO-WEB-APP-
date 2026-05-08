@@ -28,3 +28,13 @@ export const updateReserva = `
 export const deleteReserva = `
   DELETE FROM reserva WHERE id = $1;
 `;
+
+export const checkAvailability = `
+  SELECT *
+  FROM reserva
+  WHERE id_alojamiento = $1
+  AND (
+    fecha_inicio < $3
+    AND fecha_fin > $2
+  );
+`;
