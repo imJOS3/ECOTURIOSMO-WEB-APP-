@@ -100,3 +100,11 @@ const { rows } = await pool.query(
 
   return rows[0];
 };
+
+export const getMine = async (user) => {
+  const result = await pool.query(
+    'SELECT * FROM reserva WHERE id_turista = $1 ORDER BY created_at DESC',
+    [user.id]
+  );
+  return result.rows;
+};

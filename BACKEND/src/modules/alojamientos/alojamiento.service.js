@@ -2,19 +2,14 @@ import pool from '../../config/database.js';
 import * as q from './alojamiento.queries.js';
 
 export const create = async (data, user) => {
-  const {
-    titulo,
-    descripcion,
-    ubicacion,
-    latitud,
-    longitud
-  } = data;
+  const { titulo, descripcion, ubicacion, precio, latitud, longitud } = data;
 
   const { rows } = await pool.query(q.createAlojamiento, [
     user.id,
     titulo,
     descripcion,
     ubicacion,
+    precio,
     latitud,
     longitud
   ]);
@@ -38,18 +33,13 @@ export const getMyAlojamientos = async (user) => {
 };
 
 export const update = async (id, data) => {
-  const {
-    titulo,
-    descripcion,
-    ubicacion,
-    latitud,
-    longitud
-  } = data;
+  const { titulo, descripcion, ubicacion, precio, latitud, longitud } = data;
 
   const { rows } = await pool.query(q.updateAlojamiento, [
     titulo,
     descripcion,
     ubicacion,
+    precio,
     latitud,
     longitud,
     id

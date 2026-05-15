@@ -4,10 +4,11 @@ export const createAlojamiento = `
     titulo,
     descripcion,
     ubicacion,
+    precio,
     latitud,
     longitud
   )
-  VALUES ($1, $2, $3, $4, $5, $6)
+  VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;
 `;
 
@@ -41,9 +42,10 @@ export const updateAlojamiento = `
     titulo = $1,
     descripcion = $2,
     ubicacion = $3,
-    latitud = $4,
-    longitud = $5
-  WHERE id = $6
+    precio = $4,
+    latitud = $5,
+    longitud = $6
+  WHERE id = $7
   RETURNING *;
 `;
 
