@@ -9,6 +9,7 @@ import pagoRoutes from '../modules/pagos/pago.routes.js';
 import resenaRoutes from '../modules/resenas/resena.routes.js';
 import categoriaRoutes from '../modules/categorias/categoria.routes.js';
 import unidadRoutes from '../modules/unidades/unidad.routes.js';
+import moderacionRoutes from '../modules/moderacion/moderacion.routes.js';
 // luego agregas reservas, pagos, etc.
 
 const router = Router();
@@ -22,5 +23,6 @@ router.use('/reservas', reservaRoutes);
 router.use('/pagos', pagoRoutes);
 router.use('/resenas', resenaRoutes);
 router.use('/categorias', categoriaRoutes);
+router.use('/admin/moderacion', moderacionRoutes);
 
 export default router;

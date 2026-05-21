@@ -35,6 +35,16 @@ export const create = async (data, user) => {
     };
   }
 
+  if (
+    unidad.estado_publicacion !== 'aprobado' ||
+    unidad.alojamiento_estado_publicacion !== 'aprobado'
+  ) {
+    throw {
+      status: 403,
+      message: 'Content not approved'
+    };
+  }
+
   // ✅ validar disponible
   if (!unidad.disponible) {
     throw {

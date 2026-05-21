@@ -1,3 +1,5 @@
+// alojamiento.queries.js
+
 export const createAlojamiento = `
   INSERT INTO alojamiento (
     id_anfitrion,
@@ -5,28 +7,53 @@ export const createAlojamiento = `
     descripcion,
     ubicacion,
     latitud,
-    longitud
+    longitud,
+    estado
   )
-  VALUES ($1, $2, $3, $4, $5, $6)
+  VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;
 `;
 
-// Obtener todos los alojamientos activos
+// Público/turista -> SOLO aprobados
 export const getAllAlojamientos = `
   SELECT *
   FROM alojamiento
-  WHERE estado = 'activo'
+  WHERE estado = 'aprobado'
   ORDER BY created_at DESC;
 `;
 
-// Obtener un alojamiento por ID
-export const getAlojamientoById = `
+// Admin -> todos
+export const getAllAlojamientosAll = `
+  SELECT *
+  FROM alojamiento
+  ORDER BY created_at DESC;
+`;
+
+// Anfitrión -> sus alojamientos + aprobados
+export const getAllAlojamientosForAnfitrion = `
+  SELECT *
+  FROM alojamiento
+  WHERE estado = 'aprobado'
+     OR id_anfitrion = $1
+  ORDER BY created_at DESC;
+`;
+
+// Obtener por id sin filtrar
+export const getAlojamientoByIdAny = `
   SELECT *
   FROM alojamiento
   WHERE id = $1;
 `;
 
-// Obtener alojamientos de un anfitrión
+// Público -> solo aprobados
+export const getAlojamientoById = `
+  SELECT *
+  FROM alojamiento
+  WHERE id = $1
+  AND estado = 'aprobado';
+`;
+
+// Mis alojamientos
 export const getByAnfitrion = `
   SELECT *
   FROM alojamiento
@@ -34,7 +61,7 @@ export const getByAnfitrion = `
   ORDER BY created_at DESC;
 `;
 
-// Actualizar alojamiento
+// Actualizar
 export const updateAlojamiento = `
   UPDATE alojamiento
   SET
@@ -47,7 +74,7 @@ export const updateAlojamiento = `
   RETURNING *;
 `;
 
-// Eliminar alojamiento
+// Eliminar
 export const deleteAlojamiento = `
   DELETE FROM alojamiento
   WHERE id = $1;

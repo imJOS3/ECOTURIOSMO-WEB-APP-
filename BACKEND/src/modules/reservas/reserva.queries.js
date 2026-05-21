@@ -42,9 +42,12 @@ export const checkAvailability = `
   );
 `;
 export const getUnidadById = `
-SELECT *
-FROM unidad
-WHERE id = $1;
+SELECT
+  u.*,
+  a.estado_publicacion AS alojamiento_estado_publicacion
+FROM unidad u
+INNER JOIN alojamiento a ON a.id = u.id_alojamiento
+WHERE u.id = $1;
 `;
 
 export const checkReservaOverlap = `

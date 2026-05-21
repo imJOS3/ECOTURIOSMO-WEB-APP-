@@ -76,6 +76,72 @@ Authorization: Bearer <TOKEN>
 
 ---
 
+## 🛣️ Rutas (endpoints)
+
+Base URL: `http://localhost:3000/api`
+
+**Auth**
+- POST `/api/auth/register` — Registrar usuario (body: `nombre`, `email`, `password`, `rol` opcional).
+- POST `/api/auth/login` — Autenticar y recibir `{ user, token }`.
+
+**Usuarios** (`/api/usuarios`)
+- GET `/api/usuarios/` — (Auth + `admin`) Listar usuarios.
+- GET `/api/usuarios/:id` — (Auth) Obtener usuario por id.
+- POST `/api/usuarios/` — Crear usuario (registro manual o por admin).
+- PUT `/api/usuarios/:id` — (Auth) Actualizar usuario (admin o propio usuario).
+- DELETE `/api/usuarios/:id` — (Auth + `admin`) Eliminar usuario.
+
+**Alojamientos** (`/api/alojamientos`)
+- GET `/api/alojamientos/` — (Público / auth opcional) Listar alojamientos visibles según rol.
+- GET `/api/alojamientos/:id` — (Auth opcional) Ver alojamiento por id (control de acceso aplica).
+- POST `/api/alojamientos/` — (Auth + `anfitrion`) Crear alojamiento (validación de esquema aplicada).
+- GET `/api/alojamientos/mine` — (Auth + `anfitrion`) Listar alojamientos del anfitrión autenticado.
+- PUT `/api/alojamientos/:id` — (Auth + `anfitrion`) Actualizar alojamiento.
+- DELETE `/api/alojamientos/:id` — (Auth + `anfitrion`) Eliminar alojamiento.
+
+**Unidades** (`/api/unidades`)
+- POST `/api/unidades/` — (Auth + `anfitrion`) Crear unidad.
+- GET `/api/unidades/alojamiento/:id` — (Público / auth opcional) Listar unidades de un alojamiento.
+- GET `/api/unidades/:id` — (Auth opcional) Obtener unidad por id.
+- GET `/api/unidades/mine` — (Auth + `anfitrion`) Listar unidades del anfitrión.
+- PUT `/api/unidades/:id` — (Auth + `anfitrion`) Actualizar unidad.
+- DELETE `/api/unidades/:id` — (Auth + `anfitrion`) Eliminar unidad.
+
+**Reservas** (`/api/reservas`)
+- POST `/api/reservas/` — (Auth) Crear reserva.
+- GET `/api/reservas/` — (Auth) Listar reservas (según permisos).
+- GET `/api/reservas/mine` — (Auth) Listar reservas del usuario autenticado.
+- PUT `/api/reservas/:id` — (Auth) Actualizar reserva.
+- DELETE `/api/reservas/:id` — (Auth) Cancelar/eliminar reserva.
+
+**Pagos** (`/api/pagos`)
+- POST `/api/pagos/` — (Auth) Registrar pago.
+- GET `/api/pagos/` — (Auth) Listar pagos.
+- GET `/api/pagos/reserva/:id_reserva` — (Auth) Obtener pagos de una reserva.
+
+**Reseñas** (`/api/resenas`)
+- POST `/api/resenas/` — (Auth) Crear reseña para un alojamiento.
+- GET `/api/resenas/` — Obtener todas las reseñas.
+- GET `/api/resenas/alojamiento/:id` — Obtener reseñas de un alojamiento.
+
+**Categorías** (`/api/categorias`)
+- POST `/api/categorias/` — (Auth + `admin`) Crear categoría.
+- GET `/api/categorias/` — Obtener todas las categorías.
+
+**Moderación (admin)** (`/api/admin/moderacion`)
+- POST `/api/admin/moderacion/alojamientos/:id/aprobar` — (Auth + `admin`) Aprobar alojamiento.
+- POST `/api/admin/moderacion/alojamientos/:id/rechazar` — (Auth + `admin`) Rechazar alojamiento.
+- POST `/api/admin/moderacion/alojamientos/:id/suspender` — (Auth + `admin`) Suspender alojamiento.
+- POST `/api/admin/moderacion/unidades/:id/aprobar` — (Auth + `admin`) Aprobar unidad.
+- POST `/api/admin/moderacion/unidades/:id/rechazar` — (Auth + `admin`) Rechazar unidad.
+- POST `/api/admin/moderacion/unidades/:id/suspender` — (Auth + `admin`) Suspender unidad.
+
+Notas:
+- Para endpoints protegidos añade header: `Authorization: Bearer <token>`.
+- El login devuelve `{ user, token }`.
+
+---
+
 ## 📊 Códigos HTTP
 
 | Código | Significado               |

@@ -80,9 +80,10 @@ describe('Roles & Authorization', () => {
       .set('Authorization', `Bearer ${tokenAnfitrion}`)
       .send({
         titulo: 'Eco Cabaña',
-        descripcion: 'Hermosa cabaña ecológica',
-        precio: 100,
-        ubicacion: 'Colombia'
+        descripcion: 'Hermosa cabaña ecológica en zona rural',
+        ubicacion: 'Colombia',
+        latitud: 6.2442,
+        longitud: -75.5812
       });
 
     // restaurar query original
