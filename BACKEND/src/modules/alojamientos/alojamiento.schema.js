@@ -1,14 +1,10 @@
 import Joi from 'joi';
 
 export const createAlojamientoSchema = Joi.object({
-  titulo: Joi.string().min(3).max(100).required(),
-
+  titulo: Joi.string().min(3).max(150).required(),
   descripcion: Joi.string().min(10).required(),
-
-
   ubicacion: Joi.string().required(),
-
-  latitud: Joi.number().required(),
-
-  longitud: Joi.number().required()
+  precio: Joi.number().positive().required(),
+  latitud: Joi.number().optional().allow(null, ''),
+  longitud: Joi.number().optional().allow(null, '')
 });
