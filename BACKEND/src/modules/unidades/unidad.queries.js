@@ -58,11 +58,15 @@ FROM unidad u
 INNER JOIN alojamiento a
 ON a.id = u.id_alojamiento
 WHERE
+u.id_alojamiento = CAST($1 AS INTEGER)
+AND
 (
   u.estado = 'aprobado'
 )
 OR
 (
+  u.id_alojamiento = CAST($1 AS INTEGER)
+  AND
   a.id_anfitrion = CAST($2 AS INTEGER)
 )
 ORDER BY u.created_at DESC;
