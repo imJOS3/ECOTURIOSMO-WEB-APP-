@@ -285,7 +285,6 @@ const AuthModal = ({ mode: initialMode, onClose, onAuth }) => {
             <select className="form-input form-select" value={form.rol} onChange={set("rol")}>
               <option value="turista">🧍 Turista — Explorar y reservar</option>
               <option value="anfitrion">🏡 Anfitrión — Ofrecer alojamientos</option>
-              <option value="admin">🛡️ Administrador — Gestionar plataforma</option>
             </select>
           </div>
         )}
