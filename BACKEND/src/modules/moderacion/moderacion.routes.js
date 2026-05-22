@@ -13,4 +13,6 @@ router.post('/unidades/:id/aprobar', auth, checkRole('admin'), ctrl.aprobarUnida
 router.post('/unidades/:id/rechazar', auth, checkRole('admin'), ctrl.rechazarUnidad);
 router.post('/unidades/:id/suspender', auth, checkRole('admin'), ctrl.suspenderUnidad);
 
+router.get('/log', auth, checkRole('admin'), ctrl.getModeracionLog);
+
 export default router;

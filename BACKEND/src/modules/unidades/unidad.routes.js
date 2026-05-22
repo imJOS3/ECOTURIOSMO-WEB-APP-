@@ -23,6 +23,16 @@ router.post(
   ctrl.create
 );
 
+// =========================
+// VER MIS UNIDADES
+// =========================
+
+router.get(
+  '/mine',
+  auth,
+  checkRole('anfitrion'),
+  ctrl.getMine
+);
 
 // =========================
 // VER TODAS POR ALOJAMIENTO
@@ -44,19 +54,6 @@ router.get(
   authOptional,
   ctrl.getById
 );
-
-
-// =========================
-// VER MIS UNIDADES
-// =========================
-
-router.get(
-  '/mine',
-  auth,
-  checkRole('anfitrion'),
-  ctrl.getMine
-);
-
 
 // =========================
 // ACTUALIZAR

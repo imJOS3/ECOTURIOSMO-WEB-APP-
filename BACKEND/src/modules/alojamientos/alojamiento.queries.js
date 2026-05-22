@@ -2,14 +2,7 @@
 
 export const createAlojamiento = `
   INSERT INTO alojamiento (
-    id_anfitrion,
-    titulo,
-    descripcion,
-    ubicacion,
-    precio,
-    latitud,
-    longitud,
-    estado
+    id_anfitrion, titulo, descripcion, ubicacion, latitud, longitud, estado
   )
   VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;
@@ -17,23 +10,20 @@ export const createAlojamiento = `
 
 // Público/turista -> SOLO aprobados
 export const getAllAlojamientos = `
-  SELECT *
-  FROM alojamiento
+  SELECT * FROM alojamiento
   WHERE estado = 'aprobado'
   ORDER BY created_at DESC;
 `;
 
 // Admin -> todos
 export const getAllAlojamientosAll = `
-  SELECT *
-  FROM alojamiento
+  SELECT * FROM alojamiento
   ORDER BY created_at DESC;
 `;
 
-// Anfitrión -> sus alojamientos + aprobados
+// Anfitrión panel -> solo los suyos (se mantiene para compatibilidad pero ya no se usa en getAll)
 export const getAllAlojamientosForAnfitrion = `
-  SELECT *
-  FROM alojamiento
+  SELECT * FROM alojamiento
   WHERE estado = 'aprobado'
      OR id_anfitrion = $1
   ORDER BY created_at DESC;
@@ -41,43 +31,35 @@ export const getAllAlojamientosForAnfitrion = `
 
 // Obtener por id sin filtrar
 export const getAlojamientoByIdAny = `
-  SELECT *
-  FROM alojamiento
-  WHERE id = $1;
+  SELECT * FROM alojamiento WHERE id = $1;
 `;
 
 // Público -> solo aprobados
 export const getAlojamientoById = `
-  SELECT *
-  FROM alojamiento
-  WHERE id = $1
-  AND estado = 'aprobado';
+  SELECT * FROM alojamiento WHERE id = $1 AND estado = 'aprobado';
 `;
 
-// Mis alojamientos
+// Mis alojamientos (solo del anfitrión autenticado)
 export const getByAnfitrion = `
-  SELECT *
-  FROM alojamiento
+  SELECT * FROM alojamiento
   WHERE id_anfitrion = $1
   ORDER BY created_at DESC;
 `;
 
-// Actualizar
+// Actualizar — sin precio (no existe en la tabla)
 export const updateAlojamiento = `
   UPDATE alojamiento
   SET
     titulo = $1,
     descripcion = $2,
     ubicacion = $3,
-    precio = $4,
-    latitud = $5,
-    longitud = $6
-  WHERE id = $7
+    latitud = $4,
+    longitud = $5
+  WHERE id = $6
   RETURNING *;
 `;
 
 // Eliminar
 export const deleteAlojamiento = `
-  DELETE FROM alojamiento
-  WHERE id = $1;
+  DELETE FROM alojamiento WHERE id = $1;
 `;

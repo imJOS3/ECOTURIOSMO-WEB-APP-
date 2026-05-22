@@ -48,7 +48,7 @@ export const moderateContent = async ({ type, id, action, motivo, admin }) => {
     await client.query('BEGIN');
 
     const currentResult = await client.query(
-      `SELECT id, estado_publicacion
+      `SELECT id, estado
        FROM ${content.table}
        WHERE id = $1`,
       [id]
@@ -73,7 +73,7 @@ export const moderateContent = async ({ type, id, action, motivo, admin }) => {
 
     const updateResult = await client.query(
       `UPDATE ${content.table}
-       SET estado_publicacion = $1,
+       SET estado = $1,
            motivo_rechazo = $2,
            fecha_revision = NOW(),
            id_admin_revision = $3
@@ -99,7 +99,7 @@ export const moderateContent = async ({ type, id, action, motivo, admin }) => {
         id,
         moderationAction.logAction,
         action === 'aprobar' ? null : motivo || null,
-        current.estado_publicacion,
+        current.estado,              // ← corregido: era current.estado_publicacion
         moderationAction.estado,
         admin.id
       ]
@@ -113,4 +113,15 @@ export const moderateContent = async ({ type, id, action, motivo, admin }) => {
   } finally {
     client.release();
   }
+};
+
+// ─── Log de moderación ────────────────────────────────────────────────────────
+export const getLogs = async () => {
+  const { rows } = await pool.query(
+    `SELECT ml.*, u.nombre AS admin_nombre
+     FROM moderacion_log ml
+     LEFT JOIN usuario u ON u.id = ml.id_admin_revision
+     ORDER BY ml.fecha_revision DESC`
+  );
+  return rows;
 };

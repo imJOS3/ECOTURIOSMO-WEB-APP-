@@ -25,9 +25,31 @@ export const getMine = async (req, res, next) => {
   }
 };
 
+/* ─────────────────────────────────────────────
+   RESERVAS RECIBIDAS POR EL ANFITRIÓN
+───────────────────────────────────────────── */
+export const getAnfitrion = async (req, res, next) => {
+  try {
+
+    const data = await service.getReservasAnfitrion(
+      req.user
+    );
+
+    res.json(data);
+
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const update = async (req, res, next) => {
   try {
-    res.json(await service.update(req.params.id, req.body.estado));
+    res.json(
+      await service.update(
+        req.params.id,
+        req.body.estado
+      )
+    );
   } catch (err) {
     next(err);
   }

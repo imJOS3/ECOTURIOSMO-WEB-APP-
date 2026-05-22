@@ -1,6 +1,9 @@
 import pool from '../../config/database.js';
 import * as q from './reserva.queries.js';
 
+/* ─────────────────────────────────────────────
+   CREAR RESERVA
+───────────────────────────────────────────── */
 export const create = async (data, user) => {
 
   const {
@@ -9,7 +12,7 @@ export const create = async (data, user) => {
     fecha_fin
   } = data;
 
-  // ✅ validar fechas
+  // validar fechas
   const inicio = new Date(fecha_inicio);
   const fin = new Date(fecha_fin);
 
@@ -20,7 +23,7 @@ export const create = async (data, user) => {
     };
   }
 
-  // ✅ obtener unidad
+  // obtener unidad
   const unidadResult = await pool.query(
     q.getUnidadById,
     [id_unidad]
@@ -35,8 +38,9 @@ export const create = async (data, user) => {
     };
   }
 
+  // validar moderación
   if (
-    unidad.estado_publicacion !== 'aprobado' ||
+    unidad.estado !== 'aprobado' ||
     unidad.alojamiento_estado_publicacion !== 'aprobado'
   ) {
     throw {
@@ -45,7 +49,7 @@ export const create = async (data, user) => {
     };
   }
 
-  // ✅ validar disponible
+  // validar disponibilidad
   if (!unidad.disponible) {
     throw {
       status: 400,
@@ -53,7 +57,7 @@ export const create = async (data, user) => {
     };
   }
 
-  // 🔒 UNIDAD PRIVADA
+  // unidad privada
   if (!unidad.es_compartido) {
 
     const overlap = await pool.query(
@@ -69,7 +73,7 @@ export const create = async (data, user) => {
     }
   }
 
-  // 👥 UNIDAD COMPARTIDA
+  // unidad compartida
   else {
 
     const reservasActivas = await pool.query(
@@ -88,33 +92,124 @@ export const create = async (data, user) => {
     }
   }
 
-  // ✅ calcular noches
+  // calcular noches
   const noches =
     (fin - inicio) / (1000 * 60 * 60 * 24);
 
-  // ✅ calcular total automático
+  // calcular total
   const total =
     noches * unidad.precio_noche;
 
-  // ✅ crear reserva
-const { rows } = await pool.query(
-  q.createReserva,
-  [
-    user.id,
-    id_unidad,
-    fecha_inicio,
-    fecha_fin,
-    total
-  ]
-);
+  // crear reserva
+  const { rows } = await pool.query(
+    q.createReserva,
+    [
+      user.id,
+      id_unidad,
+      fecha_inicio,
+      fecha_fin,
+      total
+    ]
+  );
 
   return rows[0];
 };
 
+/* ─────────────────────────────────────────────
+   TODAS LAS RESERVAS
+───────────────────────────────────────────── */
+export const getAll = async () => {
+
+  const { rows } = await pool.query(
+    q.getReservas
+  );
+
+  return rows;
+};
+
+/* ─────────────────────────────────────────────
+   RESERVAS DEL TURISTA
+───────────────────────────────────────────── */
 export const getMine = async (user) => {
-  const result = await pool.query(
-    'SELECT * FROM reserva WHERE id_turista = $1 ORDER BY created_at DESC',
+
+  const { rows } = await pool.query(
+    q.getReservasByUser,
     [user.id]
   );
-  return result.rows;
+
+  return rows;
+};
+
+/* ─────────────────────────────────────────────
+   RESERVAS DEL ANFITRIÓN
+───────────────────────────────────────────── */
+export const getReservasAnfitrion = async (user) => {
+
+  const { rows } = await pool.query(
+    q.getReservasByAnfitrion,
+    [user.id]
+  );
+
+  return rows;
+};
+
+/* ─────────────────────────────────────────────
+   ACTUALIZAR ESTADO
+───────────────────────────────────────────── */
+export const update = async (id, estado) => {
+
+  const estadosValidos = [
+    'pendiente',
+    'confirmada',
+    'cancelada'
+  ];
+
+  if (!estadosValidos.includes(estado)) {
+    throw {
+      status: 400,
+      message: 'Invalid reservation status'
+    };
+  }
+
+  const { rows } = await pool.query(
+    q.updateReserva,
+    [estado, id]
+  );
+
+  if (!rows[0]) {
+    throw {
+      status: 404,
+      message: 'Reservation not found'
+    };
+  }
+
+  return rows[0];
+};
+
+/* ─────────────────────────────────────────────
+   ELIMINAR RESERVA
+───────────────────────────────────────────── */
+export const remove = async (id) => {
+
+  const reserva = await pool.query(
+    q.getReservaById,
+    [id]
+  );
+
+  if (!reserva.rows[0]) {
+    throw {
+      status: 404,
+      message: 'Reservation not found'
+    };
+  }
+
+  await pool.query(
+    q.deleteReserva,
+    [id]
+  );
+
+  return {
+    success: true,
+    message: 'Reservation deleted'
+  };
 };

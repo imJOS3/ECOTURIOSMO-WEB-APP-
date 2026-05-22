@@ -1,4 +1,4 @@
-import { moderateContent } from './moderacion.service.js';
+import { moderateContent, getLogs } from './moderacion.service.js';
 
 const runModeration = (type, action) => async (req, res, next) => {
   try {
@@ -23,3 +23,11 @@ export const suspenderAlojamiento = runModeration('alojamientos', 'suspender');
 export const aprobarUnidad = runModeration('unidades', 'aprobar');
 export const rechazarUnidad = runModeration('unidades', 'rechazar');
 export const suspenderUnidad = runModeration('unidades', 'suspender');
+export const getModeracionLog = async (req, res, next) => {
+  try {
+    const logs = await getLogs();
+    res.json(logs);
+  } catch (err) {
+    next(err);
+  }
+};

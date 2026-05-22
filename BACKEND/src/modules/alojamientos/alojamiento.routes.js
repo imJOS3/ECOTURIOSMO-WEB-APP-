@@ -28,6 +28,16 @@ router.get(
   ctrl.getAll
 );
 
+// =========================
+// MIS ALOJAMIENTOS
+// =========================
+
+router.get(
+  '/mine',
+  auth,
+  checkRole('anfitrion'),
+  ctrl.getMine
+);
 
 // =========================
 // VER POR ID
@@ -51,19 +61,6 @@ router.post(
   validate(createAlojamientoSchema),
   ctrl.create
 );
-
-
-// =========================
-// MIS ALOJAMIENTOS
-// =========================
-
-router.get(
-  '/mine',
-  auth,
-  checkRole('anfitrion'),
-  ctrl.getMine
-);
-
 
 // =========================
 // ACTUALIZAR

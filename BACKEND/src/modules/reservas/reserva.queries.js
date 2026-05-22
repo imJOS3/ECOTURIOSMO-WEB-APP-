@@ -9,44 +9,97 @@ INSERT INTO reserva (
 VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 `;
+
+/* ─────────────────────────────────────────────
+   TODAS LAS RESERVAS
+───────────────────────────────────────────── */
 export const getReservas = `
-  SELECT * FROM reserva ORDER BY created_at DESC;
+SELECT
+  r.*,
+  u.nombre AS nombre_unidad,
+  a.titulo AS nombre_alojamiento,
+  usr.nombre AS nombre_turista
+FROM reserva r
+INNER JOIN unidad u
+  ON u.id = r.id_unidad
+INNER JOIN alojamiento a
+  ON a.id = u.id_alojamiento
+INNER JOIN usuario usr
+  ON usr.id = r.id_turista
+ORDER BY r.created_at DESC;
+`;
+
+/* ─────────────────────────────────────────────
+   RESERVAS DEL TURISTA
+───────────────────────────────────────────── */
+export const getReservasByUser = `
+SELECT
+  r.*,
+  u.nombre AS nombre_unidad,
+  a.titulo AS nombre_alojamiento
+FROM reserva r
+INNER JOIN unidad u
+  ON u.id = r.id_unidad
+INNER JOIN alojamiento a
+  ON a.id = u.id_alojamiento
+WHERE r.id_turista = $1
+ORDER BY r.created_at DESC;
+`;
+
+/* ─────────────────────────────────────────────
+   RESERVAS DEL ANFITRIÓN
+───────────────────────────────────────────── */
+export const getReservasByAnfitrion = `
+SELECT
+  r.*,
+  u.nombre AS nombre_unidad,
+  a.titulo AS nombre_alojamiento,
+  usr.nombre AS nombre_turista
+FROM reserva r
+INNER JOIN unidad u
+  ON u.id = r.id_unidad
+INNER JOIN alojamiento a
+  ON a.id = u.id_alojamiento
+INNER JOIN usuario usr
+  ON usr.id = r.id_turista
+WHERE a.id_anfitrion = $1
+ORDER BY r.created_at DESC;
 `;
 
 export const getReservaById = `
-  SELECT * FROM reserva WHERE id = $1;
-`;
-
-export const getReservasByUser = `
-  SELECT * FROM reserva WHERE id_turista = $1;
+SELECT * FROM reserva
+WHERE id = $1;
 `;
 
 export const updateReserva = `
-  UPDATE reserva
-  SET estado = $1
-  WHERE id = $2
-  RETURNING *;
+UPDATE reserva
+SET estado = $1
+WHERE id = $2
+RETURNING *;
 `;
 
 export const deleteReserva = `
-  DELETE FROM reserva WHERE id = $1;
+DELETE FROM reserva
+WHERE id = $1;
 `;
 
 export const checkAvailability = `
-  SELECT *
-  FROM reserva
-  WHERE id_alojamiento = $1
-  AND (
-    fecha_inicio < $3
-    AND fecha_fin > $2
-  );
+SELECT *
+FROM reserva
+WHERE id_alojamiento = $1
+AND (
+  fecha_inicio < $3
+  AND fecha_fin > $2
+);
 `;
+
 export const getUnidadById = `
 SELECT
   u.*,
-  a.estado_publicacion AS alojamiento_estado_publicacion
+  a.estado AS alojamiento_estado_publicacion
 FROM unidad u
-INNER JOIN alojamiento a ON a.id = u.id_alojamiento
+INNER JOIN alojamiento a
+  ON a.id = u.id_alojamiento
 WHERE u.id = $1;
 `;
 
