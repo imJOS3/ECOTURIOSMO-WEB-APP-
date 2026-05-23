@@ -1,0 +1,260 @@
+// src/pages/PagePanel.jsx
+import { useState, useCallback, useEffect } from "react";
+import { apiFetch } from "../utils/api";
+import { Badge, Spinner, EmptyState } from "../components/ui";
+import { AlojamientoForm } from "../components/AlojamientoForm";
+import { TabModeracion, TabModeracionLog } from "../panels/TabModeracion";
+import { TabReservasAnfitrion, TabMisUnidades } from "../panels/TabAnfitrion";
+import { CalendarIcon, HomeIcon, BedIcon, PaymentIcon, TagIcon, GroupIcon, AdminIcon, ReviewIcon } from "../components/icons";
+
+// ─── Crear Categoría ───────────────────────────────────────────────────────────
+const CrearCategoria = ({ onCreated }) => {
+  const [nombre, setNombre] = useState("");
+  const [msg, setMsg] = useState("");
+
+  const submit = async () => {
+    if (!nombre.trim()) return;
+    try {
+      await apiFetch("/categorias", { method: "POST", body: JSON.stringify({ nombre }) });
+      setNombre(""); setMsg("¡Categoría creada!"); onCreated();
+    } catch (e) { setMsg(e.message); }
+  };
+
+  return (
+    <div style={{ display: "flex", gap: 8, marginBottom: "1.5rem", alignItems: "flex-end" }}>
+      <div style={{ flex: 1 }}>
+        <label className="form-label">Nueva categoría</label>
+        <input
+          className="form-input"
+          placeholder="Ej: Senderismo, Avistamiento..."
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+        />
+      </div>
+      <button className="btn btn-primary btn-sm" onClick={submit} style={{ height: 42 }}>Agregar</button>
+      {msg && <span style={{ fontSize: "0.8rem", color: "var(--green)" }}>{msg}</span>}
+    </div>
+  );
+};
+
+// ─── PagePanel ─────────────────────────────────────────────────────────────────
+const PagePanel = ({ user }) => {
+  const [tab, setTab] = useState("reservas");
+  const [reservas, setReservas] = useState([]);
+  const [alojamientos, setAlojamientos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [pagos, setPagos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showAlojForm, setShowAlojForm] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const loadTab = useCallback(async (t) => {
+    setLoading(true); setMsg("");
+    try {
+      if (t === "reservas")    { const d = await apiFetch("/reservas/mine"); setReservas(Array.isArray(d) ? d : []); }
+      if (t === "alojamientos"){ const d = await apiFetch("/alojamientos"); setAlojamientos(Array.isArray(d) ? d : []); }
+      if (t === "pagos")       { const d = await apiFetch("/pagos"); setPagos(Array.isArray(d) ? d : []); }
+      if (t === "usuarios" && user.rol === "admin") { const d = await apiFetch("/usuarios"); setUsuarios(Array.isArray(d) ? d : []); }
+      if (t === "categorias")  { const d = await apiFetch("/categorias"); setCategorias(Array.isArray(d) ? d : []); }
+    } catch (e) { setMsg(e.message); }
+    finally { setLoading(false); }
+  }, [user]);
+
+  useEffect(() => { loadTab(tab); }, [tab, loadTab]);
+
+  const cancelReserva = async (id) => {
+    try { await apiFetch(`/reservas/${id}`, { method: "PUT", body: JSON.stringify({ estado: "cancelada" }) }); loadTab("reservas"); }
+    catch (e) { setMsg(e.message); }
+  };
+
+  const deleteAlojamiento = async (id) => {
+    if (!confirm("¿Eliminar este alojamiento?")) return;
+    try { await apiFetch(`/alojamientos/${id}`, { method: "DELETE" }); loadTab("alojamientos"); }
+    catch (e) { setMsg(e.message); }
+  };
+
+  const SPECIAL_TABS = ["moderacion", "moderacion_unidades", "moderacion_log", "unidades", "reservas_recibidas"];
+
+  const tabs = [
+    { id: "reservas", label: "Mis Reservas", icon: CalendarIcon },
+    ...(user.rol === "anfitrion" ? [
+      { id: "reservas_recibidas", label: "Reservas recibidas", icon: CalendarIcon },
+      { id: "alojamientos", label: "Alojamientos", icon: HomeIcon },
+      { id: "unidades", label: "Unidades", icon: BedIcon },
+    ] : []),
+    { id: "pagos", label: "Pagos", icon: PaymentIcon },
+    { id: "categorias", label: "Categorías", icon: TagIcon },
+    ...(user.rol === "admin" ? [
+      { id: "alojamientos", label: "Alojamientos", icon: HomeIcon },
+      { id: "usuarios", label: "Usuarios", icon: GroupIcon },
+      { id: "moderacion", label: "Mod. Alojamientos", icon: AdminIcon },
+      { id: "moderacion_unidades", label: "Mod. Unidades", icon: BedIcon },
+      { id: "moderacion_log", label: "Log moderación", icon: ReviewIcon },
+    ] : []),
+  ];
+
+  return (
+    <div>
+      {/* Profile Card */}
+      <div className="profile-card">
+        <div className="avatar">{user.nombre?.[0]?.toUpperCase()}</div>
+        <div>
+          <p style={{ fontWeight: 500, fontSize: "1rem" }}>{user.nombre}</p>
+          <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>{user.email}</p>
+          <Badge status={user.rol} />
+        </div>
+      </div>
+
+      {msg && <div className="alert alert-error">{msg}</div>}
+
+      <div className="tabs">
+        {tabs.map((t) => (
+          <button key={t.id} className={`tab ${tab === t.id ? "active" : ""}`} onClick={() => setTab(t.id)}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><t.icon fontSize="small" /> {t.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Special tabs (self-loading) */}
+      {tab === "moderacion"         && <TabModeracion tipoInicial="alojamientos" />}
+      {tab === "moderacion_unidades"&& <TabModeracion tipoInicial="unidades" />}
+      {tab === "moderacion_log"     && <TabModeracionLog />}
+      {tab === "reservas_recibidas" && <TabReservasAnfitrion />}
+      {tab === "unidades"           && <TabMisUnidades />}
+
+      {/* Data tabs */}
+      {!SPECIAL_TABS.includes(tab) && (
+        loading ? <Spinner /> : (
+          <>
+            {/* ── Mis Reservas ── */}
+            {tab === "reservas" && (
+              reservas.length === 0 ? <EmptyState icon={<CalendarIcon fontSize="inherit" />} message="Sin reservas aún" /> : (
+                <div className="table-wrap">
+                  <table>
+                    <thead><tr><th>ID</th><th>Unidad</th><th>Entrada</th><th>Salida</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
+                    <tbody>
+                      {reservas.map((r) => (
+                        <tr key={r.id}>
+                          <td>#{r.id}</td>
+                          <td>{r.nombre_unidad}</td>
+                          <td>{new Date(r.fecha_inicio).toLocaleDateString("es-CO")}</td>
+                          <td>{new Date(r.fecha_fin).toLocaleDateString("es-CO")}</td>
+                          <td>${parseFloat(r.total || 0).toFixed(0)}</td>
+                          <td><Badge status={r.estado} /></td>
+                          <td>{r.estado === "pendiente" && <button className="btn btn-danger btn-sm" onClick={() => cancelReserva(r.id)}>Cancelar</button>}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            )}
+
+            {/* ── Alojamientos ── */}
+            {tab === "alojamientos" && (
+              <div>
+                {(user.rol === "anfitrion" || user.rol === "admin") && (
+                  <button className="btn btn-primary btn-sm" style={{ marginBottom: "1rem" }} onClick={() => setShowAlojForm(true)}>
+                    + Nuevo alojamiento
+                  </button>
+                )}
+                {alojamientos.length === 0 ? <EmptyState icon={<HomeIcon fontSize="inherit" />} message="Sin alojamientos" /> : (
+                  <div className="table-wrap">
+                    <table>
+                      <thead><tr><th>Título</th><th>Ubicación</th><th>Estado</th><th>Acción</th></tr></thead>
+                      <tbody>
+                        {alojamientos.map((a) => (
+                          <tr key={a.id}>
+                            <td>{a.titulo}</td>
+                            <td>{a.ubicacion}</td>
+                            <td><Badge status={a.estado || a.estado_publicacion} /></td>
+                            <td>{(user.rol === "anfitrion" || user.rol === "admin") && (
+                              <button className="btn btn-danger btn-sm" onClick={() => deleteAlojamiento(a.id)}>Eliminar</button>
+                            )}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Pagos ── */}
+            {tab === "pagos" && (
+              pagos.length === 0 ? <EmptyState icon={<PaymentIcon fontSize="inherit" />} message="Sin pagos registrados" /> : (
+                <div className="table-wrap">
+                  <table>
+                    <thead><tr><th>ID</th><th>Reserva</th><th>Monto</th><th>Método</th><th>Estado</th><th>Fecha</th></tr></thead>
+                    <tbody>
+                      {pagos.map((p) => (
+                        <tr key={p.id}>
+                          <td>#{p.id}</td><td>#{p.id_reserva}</td>
+                          <td>${parseFloat(p.monto || 0).toFixed(0)}</td>
+                          <td>{p.metodo}</td>
+                          <td><Badge status={p.estado} /></td>
+                          <td>{new Date(p.fecha_pago).toLocaleDateString("es-CO")}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            )}
+
+            {/* ── Categorías ── */}
+            {tab === "categorias" && (
+              <div>
+                {user.rol === "admin" && <CrearCategoria onCreated={() => loadTab("categorias")} />}
+                {categorias.length === 0 ? <EmptyState icon={<TagIcon fontSize="inherit" />} message="Sin categorías" /> : (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {categorias.map((c) => (
+                      <span key={c.id} className="badge badge-green" style={{ padding: "6px 14px", fontSize: "0.875rem" }}>{c.nombre}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Usuarios (admin) ── */}
+            {tab === "usuarios" && user.rol === "admin" && (
+              usuarios.length === 0 ? <EmptyState icon={<GroupIcon fontSize="inherit" />} message="Sin usuarios" /> : (
+                <div className="table-wrap">
+                  <table>
+                    <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Registrado</th></tr></thead>
+                    <tbody>
+                      {usuarios.map((u) => (
+                        <tr key={u.id}>
+                          <td style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--green-light)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "var(--green)", fontWeight: 600 }}>
+                              {u.nombre?.[0]}
+                            </div>
+                            {u.nombre}
+                          </td>
+                          <td>{u.email}</td>
+                          <td><Badge status={u.rol} /></td>
+                          <td>{new Date(u.created_at).toLocaleDateString("es-CO")}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            )}
+          </>
+        )
+      )}
+
+      {showAlojForm && (
+        <AlojamientoForm
+          onClose={() => setShowAlojForm(false)}
+          onCreated={() => { setShowAlojForm(false); loadTab("alojamientos"); }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default PagePanel;

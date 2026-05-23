@@ -197,7 +197,6 @@ El sistema aún **no incluye**:
 
 
 - ❌ Cálculo automático de precios
-- ❌ Relación categorías ↔ alojamientos
 - ❌ Subida de imágenes
 - ❌ Validación avanzada de datos (Zod / Joi)
 - ❌ Paginación en endpoints

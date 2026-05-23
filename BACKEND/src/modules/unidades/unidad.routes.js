@@ -9,6 +9,10 @@ import authOptional from '../../middlewares/authOptional.middleware.js';
 
 import { checkRole } from '../../middlewares/role.middleware.js';
 
+import validate from '../../middlewares/validate.middleware.js';
+
+import { createUnidadSchema, updateUnidadSchema } from './unidad.schema.js';
+
 const router = Router();
 
 
@@ -20,6 +24,7 @@ router.post(
   '/',
   auth,
   checkRole('anfitrion'),
+  validate(createUnidadSchema),
   ctrl.create
 );
 
@@ -63,6 +68,7 @@ router.put(
   '/:id',
   auth,
   checkRole('anfitrion'),
+  validate(updateUnidadSchema),
   ctrl.update
 );
 

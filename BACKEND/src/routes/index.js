@@ -10,11 +10,14 @@ import resenaRoutes from '../modules/resenas/resena.routes.js';
 import categoriaRoutes from '../modules/categorias/categoria.routes.js';
 import unidadRoutes from '../modules/unidades/unidad.routes.js';
 import moderacionRoutes from '../modules/moderacion/moderacion.routes.js';
-// luego agregas reservas, pagos, etc.
+import unidadImagenRoutes from '../modules/unidades/unidad-imagen/unidad-imagen.routes.js';
+import alojamientoImagenRoutes from '../modules/alojamientos/alojamiento-imagen/alojamiento-imagen.routes.js';
+
+
 
 const router = Router();
 
-// agrupar rutas
+// agrupar rutas 
 router.use('/unidades', unidadRoutes);
 router.use('/auth', authRoutes);
 router.use('/usuarios', usuarioRoutes);
@@ -24,5 +27,16 @@ router.use('/pagos', pagoRoutes);
 router.use('/resenas', resenaRoutes);
 router.use('/categorias', categoriaRoutes);
 router.use('/admin/moderacion', moderacionRoutes);
+
+router.use(
+  '/api/unidad-imagen',
+  unidadImagenRoutes
+);
+
+router.use(
+  '/api/alojamiento-imagen',
+  alojamientoImagenRoutes
+);
+
 
 export default router;

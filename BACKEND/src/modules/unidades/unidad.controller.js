@@ -5,33 +5,93 @@ import * as service from './unidad.service.js';
 // CREAR
 // =========================
 
-export const create = async (req, res, next) => {
+export const create = async (
+  data,
+  user
+) => {
 
-  try {
+  const {
+    id_alojamiento,
+    nombre,
+    tipo,
+    descripcion,
+    capacidad,
+    precio_noche,
+    cupos_disponibles,
+    es_compartido,
+    categorias
+  } = data;
 
-    const unidad = await service.create(
-      req.body,
-      req.user
-    );
+  // =========================
+  // VALIDAR CATEGORIAS
+  // =========================
 
-    res.status(201).json({
-      success: true,
-      data: unidad
-    });
+  await categoriaRelations.validateCategoriasExist(
+    categorias,
+    'unidad'
+  );
 
-  } catch (err) {
+  // =========================
+  // VALIDAR ALOJAMIENTO
+  // =========================
 
-    if (err.message === 'FORBIDDEN') {
-      return res.status(403).json({
-        success: false,
-        message: 'No puedes crear unidades en este alojamiento'
-      });
-    }
+  const { rows: alojamientoRows } = await pool.query(
+    q.getAlojamientoOwner,
+    [id_alojamiento]
+  );
 
-    next(err);
+  const alojamiento = alojamientoRows[0];
+
+  if (!alojamiento) {
+    throw new Error('ALOJAMIENTO_NOT_FOUND');
   }
-};
 
+  // =========================
+  // VALIDAR OWNER
+  // =========================
+
+  const isOwner =
+    alojamiento.id_anfitrion === user.id;
+
+  const isAdmin =
+    user.rol === 'admin';
+
+  if (!isOwner && !isAdmin) {
+    throw new Error('FORBIDDEN');
+  }
+
+  // =========================
+  // CREAR
+  // =========================
+
+  const { rows } = await pool.query(
+    q.createUnidad,
+    [
+      id_alojamiento,
+      nombre,
+      tipo,
+      descripcion,
+      capacidad,
+      cupos_disponibles || capacidad,
+      es_compartido,
+      precio_noche,
+      'pendiente_revision'
+    ]
+  );
+
+  // =========================
+  // CATEGORIAS
+  // =========================
+
+  await categoriaRelations.setUnidadCategorias(
+    rows[0].id,
+    categorias
+  );
+
+  return categoriaRelations.attachUnidadCategorias(
+    rows[0]
+  );
+};
 
 // =========================
 // OBTENER POR ALOJAMIENTO

@@ -1,14 +1,21 @@
 // unidad.service.js
 
 import pool from '../../config/database.js';
+
 import * as q from './unidad.queries.js';
+
+import * as categoriaRelations
+from '../categorias/categoria.relations.service.js';
 
 
 // =========================
 // CREAR
 // =========================
 
-export const create = async (data, user) => {
+export const create = async (
+  data,
+  user
+) => {
 
   const {
     id_alojamiento,
@@ -16,9 +23,21 @@ export const create = async (data, user) => {
     tipo,
     descripcion,
     capacidad,
+    precio_noche,
+    cupos_disponibles,
     es_compartido,
-    precio_noche
+    categorias
   } = data;
+
+
+  // =========================
+  // VALIDAR CATEGORIAS
+  // =========================
+
+  await categoriaRelations.validateCategoriasExist(
+    categorias,
+    'unidad'
+  );
 
 
   // =========================
@@ -33,7 +52,7 @@ export const create = async (data, user) => {
   const alojamiento = alojamientoRows[0];
 
   if (!alojamiento) {
-    throw new Error('FORBIDDEN');
+    throw new Error('ALOJAMIENTO_NOT_FOUND');
   }
 
 
@@ -41,19 +60,15 @@ export const create = async (data, user) => {
   // VALIDAR OWNER
   // =========================
 
-  if (
-    user.rol !== 'admin' &&
-    alojamiento.id_anfitrion !== user.id
-  ) {
+  const isOwner =
+    alojamiento.id_anfitrion === user.id;
+
+  const isAdmin =
+    user.rol === 'admin';
+
+  if (!isOwner && !isAdmin) {
     throw new Error('FORBIDDEN');
   }
-
-
-  // =========================
-  // CUPOS
-  // =========================
-
-  const cupos_disponibles = capacidad;
 
 
   // =========================
@@ -68,14 +83,27 @@ export const create = async (data, user) => {
       tipo,
       descripcion,
       capacidad,
-      cupos_disponibles,
+      cupos_disponibles || capacidad,
       es_compartido,
       precio_noche,
       'pendiente_revision'
     ]
   );
 
-  return rows[0];
+
+  // =========================
+  // CATEGORIAS
+  // =========================
+
+  await categoriaRelations.setUnidadCategorias(
+    rows[0].id,
+    categorias
+  );
+
+
+  return categoriaRelations.attachUnidadCategorias(
+    rows[0]
+  );
 };
 
 
@@ -106,7 +134,11 @@ export const getByAlojamiento = async (
       [id]
     );
 
-    return rows;
+    return Promise.all(
+      rows.map(
+        categoriaRelations.attachUnidadCategorias
+      )
+    );
   }
 
 
@@ -121,7 +153,11 @@ export const getByAlojamiento = async (
       [id, user.id]
     );
 
-    return rows;
+    return Promise.all(
+      rows.map(
+        categoriaRelations.attachUnidadCategorias
+      )
+    );
   }
 
 
@@ -134,7 +170,11 @@ export const getByAlojamiento = async (
     [id]
   );
 
-  return rows;
+  return Promise.all(
+    rows.map(
+      categoriaRelations.attachUnidadCategorias
+    )
+  );
 };
 
 
@@ -164,7 +204,10 @@ export const getById = async (
   // =========================
 
   if (user && user.rol === 'admin') {
-    return unidad;
+
+    return categoriaRelations.attachUnidadCategorias(
+      unidad
+    );
   }
 
 
@@ -175,7 +218,10 @@ export const getById = async (
   if (!user || user.rol === 'turista') {
 
     if (unidad.estado === 'aprobado') {
-      return unidad;
+
+      return categoriaRelations.attachUnidadCategorias(
+        unidad
+      );
     }
 
     return null;
@@ -198,14 +244,22 @@ export const getById = async (
     const isOwner =
       alojamiento.id_anfitrion === user.id;
 
+
     // puede ver todo lo suyo
     if (isOwner) {
-      return unidad;
+
+      return categoriaRelations.attachUnidadCategorias(
+        unidad
+      );
     }
+
 
     // de otros solo aprobado
     if (unidad.estado === 'aprobado') {
-      return unidad;
+
+      return categoriaRelations.attachUnidadCategorias(
+        unidad
+      );
     }
 
     return null;
@@ -228,7 +282,11 @@ export const getMine = async (
     [user.id]
   );
 
-  return rows;
+  return Promise.all(
+    rows.map(
+      categoriaRelations.attachUnidadCategorias
+    )
+  );
 };
 
 
@@ -300,8 +358,19 @@ export const update = async (
     descripcion,
     capacidad,
     es_compartido,
-    precio_noche
+    precio_noche,
+    categorias
   } = data;
+
+
+  // =========================
+  // VALIDAR CATEGORIAS
+  // =========================
+
+  await categoriaRelations.validateCategoriasExist(
+    categorias,
+    'unidad'
+  );
 
 
   const cupos_disponibles = capacidad;
@@ -326,7 +395,20 @@ export const update = async (
     ]
   );
 
-  return updatedRows[0];
+
+  // =========================
+  // ACTUALIZAR CATEGORIAS
+  // =========================
+
+  await categoriaRelations.setUnidadCategorias(
+    updatedRows[0].id,
+    categorias
+  );
+
+
+  return categoriaRelations.attachUnidadCategorias(
+    updatedRows[0]
+  );
 };
 
 
@@ -390,6 +472,11 @@ export const remove = async (
   // =========================
   // DELETE
   // =========================
+
+  await categoriaRelations.setUnidadCategorias(
+    id,
+    []
+  );
 
   await pool.query(
     q.deleteUnidad,

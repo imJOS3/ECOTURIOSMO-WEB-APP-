@@ -1,19 +1,89 @@
-export const createUnidad = `
-INSERT INTO unidad (
-  id_alojamiento,
-  nombre,
-  tipo,
-  descripcion,
-  capacidad,
-  cupos_disponibles,
-  es_compartido,
-  precio_noche
-)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING *;
-`;
+import Joi from 'joi';
 
-export const getUnidadesByAlojamiento = `
-SELECT * FROM unidad
-WHERE id_alojamiento = $1;
-`;
+export const createUnidadSchema = Joi.object({
+
+  id_alojamiento: Joi.number()
+    .integer()
+    .positive()
+    .required(),
+
+  nombre: Joi.string()
+    .min(2)
+    .max(255)
+    .required(),
+
+  tipo: Joi.string()
+    .required(),
+
+  descripcion: Joi.string()
+    .allow('', null),
+
+  capacidad: Joi.number()
+    .integer()
+    .positive()
+    .required(),
+
+  precio_noche: Joi.number()
+    .positive()
+    .required(),
+
+  cupos_disponibles: Joi.number()
+    .integer()
+    .positive()
+    .optional(),
+
+  es_compartido: Joi.boolean()
+    .optional(),
+
+  categorias: Joi.array()
+    .items(
+      Joi.number()
+        .integer()
+        .positive()
+    )
+    .unique()
+    .min(1)
+    .required()
+});
+
+export const updateUnidadSchema = Joi.object({
+  id_alojamiento: Joi.number()
+    .integer()
+    .positive()
+    .optional(),
+
+  nombre: Joi.string()
+    .min(3)
+    .max(150)
+    .required(),
+
+  tipo: Joi.string()
+    .min(2)
+    .max(50)
+    .required(),
+
+  descripcion: Joi.string()
+    .min(10)
+    .required(),
+
+  capacidad: Joi.number()
+    .integer()
+    .min(1)
+    .required(),
+
+  es_compartido: Joi.boolean()
+    .required(),
+  precio_noche: Joi.number()
+    .min(0)
+    .required(),
+
+  categorias: Joi.array()
+    .items(
+      Joi.number()
+        .integer()
+        .positive()
+    )
+    .unique()
+    .min(1)
+    .required()
+});

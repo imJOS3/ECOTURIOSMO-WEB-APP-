@@ -10,8 +10,15 @@ export const createAlojamiento = `
 
 // Público/turista -> SOLO aprobados
 export const getAllAlojamientos = `
-  SELECT * FROM alojamiento
-  WHERE estado = 'aprobado'
+  SELECT a.*
+  FROM alojamiento a
+  WHERE a.estado = 'aprobado'
+    AND EXISTS (
+      SELECT 1
+      FROM unidad u
+      WHERE u.id_alojamiento = a.id
+        AND u.estado = 'aprobado'
+    )
   ORDER BY created_at DESC;
 `;
 
@@ -37,6 +44,15 @@ export const getAlojamientoByIdAny = `
 // Público -> solo aprobados
 export const getAlojamientoById = `
   SELECT * FROM alojamiento WHERE id = $1 AND estado = 'aprobado';
+`;
+
+// Público/turista -> aprobado y con al menos una unidad aprobada
+export const hasApprovedUnit = `
+  SELECT 1
+  FROM unidad
+  WHERE id_alojamiento = $1
+    AND estado = 'aprobado'
+  LIMIT 1;
 `;
 
 // Mis alojamientos (solo del anfitrión autenticado)

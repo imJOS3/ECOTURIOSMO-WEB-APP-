@@ -2,29 +2,61 @@
 
 import pool from '../../config/database.js';
 import * as q from './alojamiento.queries.js';
+import * as categoriaRelations from '../categorias/categoria.relations.service.js';
 
 export const create = async (data, user) => {
-  const { titulo, descripcion, ubicacion, latitud, longitud } = data;
-  const { rows } = await pool.query(q.createAlojamiento, [
-    user.id, titulo, descripcion, ubicacion, latitud, longitud, 'pendiente_revision'
-  ]);
-  return rows[0];
+
+  const {
+    titulo,
+    descripcion,
+    ubicacion,
+    latitud,
+    longitud,
+    categorias
+  } = data;
+
+  await categoriaRelations.validateCategoriasExist(
+    categorias,
+    'alojamiento'
+  );
+
+  const { rows } = await pool.query(
+    q.createAlojamiento,
+    [
+      user.id,
+      titulo,
+      descripcion,
+      ubicacion,
+      latitud,
+      longitud,
+      'pendiente_revision'
+    ]
+  );
+
+  await categoriaRelations.setAlojamientoCategorias(
+    rows[0].id,
+    categorias
+  );
+
+  return categoriaRelations.attachAlojamientoCategorias(
+    rows[0]
+  );
 };
 
 export const getAll = async (user = null) => {
   // ADMIN
   if (user && user.rol === 'admin') {
     const { rows } = await pool.query(q.getAllAlojamientosAll);
-    return rows;
+    return Promise.all(rows.map(categoriaRelations.attachAlojamientoCategorias));
   }
   // ANFITRION -> solo los suyos
   if (user && user.rol === 'anfitrion') {
     const { rows } = await pool.query(q.getByAnfitrion, [user.id]); // ← corregido
-    return rows;
+    return Promise.all(rows.map(categoriaRelations.attachAlojamientoCategorias));
   }
   // TURISTA / PUBLICO
   const { rows } = await pool.query(q.getAllAlojamientos);
-  return rows;
+  return Promise.all(rows.map(categoriaRelations.attachAlojamientoCategorias));
 };
 
 export const getById = async (id, user = null) => {
@@ -32,32 +64,48 @@ export const getById = async (id, user = null) => {
   const alojamiento = rows[0];
   if (!alojamiento) return null;
 
-  if (user && user.rol === 'admin') return alojamiento;
+  if (user && user.rol === 'admin') {
+    return categoriaRelations.attachAlojamientoCategorias(alojamiento);
+  }
 
   if (user && user.rol === 'anfitrion') {
-    if (alojamiento.id_anfitrion === user.id) return alojamiento;
-    if (alojamiento.estado === 'aprobado') return alojamiento;
+    if (alojamiento.id_anfitrion === user.id) {
+      return categoriaRelations.attachAlojamientoCategorias(alojamiento);
+    }
+    if (alojamiento.estado === 'aprobado') {
+      return categoriaRelations.attachAlojamientoCategorias(alojamiento);
+    }
     return null;
   }
 
-  if (alojamiento.estado === 'aprobado') return alojamiento;
+  if (alojamiento.estado === 'aprobado') {
+    const { rows: unidadRows } = await pool.query(q.hasApprovedUnit, [id]);
+    if (unidadRows.length > 0) {
+      return categoriaRelations.attachAlojamientoCategorias(alojamiento);
+    }
+  }
+
   return null;
 };
 
 export const getMyAlojamientos = async (user) => {
   const { rows } = await pool.query(q.getByAnfitrion, [user.id]);
-  return rows;
+  return Promise.all(rows.map(categoriaRelations.attachAlojamientoCategorias));
 };
 
 export const update = async (id, data) => {
-  const { titulo, descripcion, ubicacion, latitud, longitud } = data;
+  const { titulo, descripcion, ubicacion, latitud, longitud, categorias } = data;
   const { rows } = await pool.query(q.updateAlojamiento, [
     titulo, descripcion, ubicacion, latitud, longitud, id
   ]);
-  return rows[0];
+
+  await categoriaRelations.setAlojamientoCategorias(rows[0].id, categorias);
+
+  return categoriaRelations.attachAlojamientoCategorias(rows[0]);
 };
 
 export const remove = async (id) => {
+  await categoriaRelations.setAlojamientoCategorias(id, []);
   await pool.query(q.deleteAlojamiento, [id]);
   return { message: 'Eliminado correctamente' };
 };
