@@ -2,95 +2,21 @@ import * as service from './unidad.service.js';
 
 
 // =========================
-// CREAR
+// CREAR (controller)
 // =========================
-
-export const create = async (
-  data,
-  user
-) => {
-
-  const {
-    id_alojamiento,
-    nombre,
-    tipo,
-    descripcion,
-    capacidad,
-    precio_noche,
-    cupos_disponibles,
-    es_compartido,
-    categorias
-  } = data;
-
-  // =========================
-  // VALIDAR CATEGORIAS
-  // =========================
-
-  await categoriaRelations.validateCategoriasExist(
-    categorias,
-    'unidad'
-  );
-
-  // =========================
-  // VALIDAR ALOJAMIENTO
-  // =========================
-
-  const { rows: alojamientoRows } = await pool.query(
-    q.getAlojamientoOwner,
-    [id_alojamiento]
-  );
-
-  const alojamiento = alojamientoRows[0];
-
-  if (!alojamiento) {
-    throw new Error('ALOJAMIENTO_NOT_FOUND');
+export const create = async (req, res, next) => {
+  try {
+    const saved = await service.create(req.body, req.user);
+    res.status(201).json({ success: true, data: saved });
+  } catch (err) {
+    if (err.message === 'ALOJAMIENTO_NOT_FOUND') {
+      return res.status(404).json({ success: false, message: 'Alojamiento no encontrado' });
+    }
+    if (err.message === 'FORBIDDEN') {
+      return res.status(403).json({ success: false, message: 'No tienes permisos' });
+    }
+    next(err);
   }
-
-  // =========================
-  // VALIDAR OWNER
-  // =========================
-
-  const isOwner =
-    alojamiento.id_anfitrion === user.id;
-
-  const isAdmin =
-    user.rol === 'admin';
-
-  if (!isOwner && !isAdmin) {
-    throw new Error('FORBIDDEN');
-  }
-
-  // =========================
-  // CREAR
-  // =========================
-
-  const { rows } = await pool.query(
-    q.createUnidad,
-    [
-      id_alojamiento,
-      nombre,
-      tipo,
-      descripcion,
-      capacidad,
-      cupos_disponibles || capacidad,
-      es_compartido,
-      precio_noche,
-      'pendiente_revision'
-    ]
-  );
-
-  // =========================
-  // CATEGORIAS
-  // =========================
-
-  await categoriaRelations.setUnidadCategorias(
-    rows[0].id,
-    categorias
-  );
-
-  return categoriaRelations.attachUnidadCategorias(
-    rows[0]
-  );
 };
 
 // =========================

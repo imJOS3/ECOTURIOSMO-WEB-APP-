@@ -17,15 +17,7 @@ import BedroomParentOutlined from "@mui/icons-material/BedroomParentOutlined";
 import AdminPanelSettingsOutlined from "@mui/icons-material/AdminPanelSettingsOutlined";
 import FactCheckOutlined from "@mui/icons-material/FactCheckOutlined";
 import CottageOutlined from "@mui/icons-material/CottageOutlined";
-import ForestOutlined from "@mui/icons-material/ForestOutlined";
-import SpaOutlined from "@mui/icons-material/SpaOutlined";
-import WaterOutlined from "@mui/icons-material/WaterOutlined";
-import TerrainOutlined from "@mui/icons-material/TerrainOutlined";
-import LocalFloristOutlined from "@mui/icons-material/LocalFloristOutlined";
-import ParkOutlined from "@mui/icons-material/ParkOutlined";
-import CabinOutlined from "@mui/icons-material/CabinOutlined";
-import WbSunnyOutlined from "@mui/icons-material/WbSunnyOutlined";
-import LandscapeOutlined from "@mui/icons-material/LandscapeOutlined";
+// Nature icons are defined in icons.constants.js
 
 export const BrandIcon = NatureOutlined;
 export const LodgingIcon = HomeWorkOutlined;
@@ -47,25 +39,3 @@ export const BedIcon = BedroomParentOutlined;
 export const AdminIcon = AdminPanelSettingsOutlined;
 export const ReviewIcon = FactCheckOutlined;
 
-export const NatureIcons = [
-  NatureOutlined,
-  ForestOutlined,
-  SpaOutlined,
-  WaterOutlined,
-  TerrainOutlined,
-  LocalFloristOutlined,
-  ParkOutlined,
-  CabinOutlined,
-  WbSunnyOutlined,
-  LandscapeOutlined,
-];
-
-export const IconLabel = ({ icon: Icon, children, style, ...props }) => (
-  <span
-    {...props}
-    style={{ display: "inline-flex", alignItems: "center", gap: 6, ...style }}
-  >
-    <Icon fontSize="small" />
-    <span>{children}</span>
-  </span>
-);

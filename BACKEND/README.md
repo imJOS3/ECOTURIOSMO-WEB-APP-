@@ -20,18 +20,6 @@ EcoTurismo API permite gestionar una plataforma de alojamientos sostenibles. Inc
 
 ---
 
-## 🧠 Arquitectura
-
-```
-src/
-├── routes/        → Endpoints de la API
-├── controllers/   → Manejo de request/response
-├── services/      → Lógica de negocio
-├── queries/       → Consultas SQL parametrizadas
-└── middlewares/   → Autenticación, autorización y errores
-```
-
----
 
 ## 🔐 Autenticación
 
@@ -175,7 +163,7 @@ npm test
 ```bash
 # Clonar el repositorio
 git clone https://github.com/tu-usuario/ecoturismo-api.git
-cd ecoturismo-api
+cd ecoturismo-api/backend
 
 # Instalar dependencias
 npm install
@@ -205,9 +193,6 @@ El sistema aún **no incluye**:
 
 ## 🛣️ Mejoras futuras
 
-- [ ] Validar disponibilidad de fechas y evitar solapamientos
-- [ ] Calcular precios dinámicamente
-- [ ] Relacionar categorías con alojamientos
 - [ ] Subida de imágenes (Cloudinary / S3)
 - [ ] Validación de inputs con Zod o Joi
 - [ ] Paginación y filtros en listados

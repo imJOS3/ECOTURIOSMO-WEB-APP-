@@ -4,8 +4,7 @@ import pool from '../../config/database.js';
 
 import * as q from './unidad.queries.js';
 
-import * as categoriaRelations
-from '../categorias/categoria.relations.service.js';
+import * as categoriaRelations from '../categorias/categoria.relations.service.js';
 
 
 // =========================

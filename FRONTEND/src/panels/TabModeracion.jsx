@@ -1,5 +1,6 @@
 // src/panels/TabModeracion.jsx
 import { useState, useEffect, useCallback } from "react";
+import useModeracionStore from "../stores/useModeracionStore";
 import { apiFetch } from "../utils/api";
 import { Badge, Spinner, EmptyState } from "../components/ui";
 import { SuccessIcon, ErrorIcon, RefreshIcon, ReviewIcon, CalendarIcon } from "../components/icons";
@@ -34,17 +35,14 @@ export const TabModeracion = ({ tipoInicial = "alojamientos" }) => {
     finally { setLoading(false); }
   }, [tipo]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { const t = setTimeout(() => { load(); }, 0); return () => clearTimeout(t); }, [load]);
 
   const getEstado = (item) => item.estado || item.estado_publicacion || "pendiente_revision";
 
   const moderate = async (id, action, motivo = "") => {
     setMsg("");
     try {
-      await apiFetch(`/admin/moderacion/${tipo}/${id}/${action}`, {
-        method: "POST",
-        body: motivo ? JSON.stringify({ motivo }) : JSON.stringify({}),
-      });
+      await useModeracionStore.getState().moderate(tipo, id, action, motivo);
       setMsg(`Acción "${action}" aplicada correctamente`);
       setMsgType("success");
       load();
@@ -184,7 +182,7 @@ export const TabModeracionLog = () => {
     finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { const t = setTimeout(() => { load(); }, 0); return () => clearTimeout(t); }, [load]);
 
   const filtered = logs.filter((l) => {
     const matchTipo = filtroTipo === "todos" || l.tipo_contenido === filtroTipo;

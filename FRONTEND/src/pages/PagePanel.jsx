@@ -1,6 +1,11 @@
 // src/pages/PagePanel.jsx
 import { useState, useCallback, useEffect } from "react";
 import { apiFetch } from "../utils/api";
+import useReservasStore from "../stores/useReservasStore";
+import { useAlojamientosStore } from "../stores/useAlojamientosStore";
+import usePagosStore from "../stores/usePagosStore";
+import useUsuariosStore from "../stores/useUsuariosStore";
+import { useCategoriasStore } from "../stores/useCategoriasStore";
 import { Badge, Spinner, EmptyState } from "../components/ui";
 import { AlojamientoForm } from "../components/AlojamientoForm";
 import { TabModeracion, TabModeracionLog } from "../panels/TabModeracion";
@@ -10,19 +15,20 @@ import { CalendarIcon, HomeIcon, BedIcon, PaymentIcon, TagIcon, GroupIcon, Admin
 // ─── Crear Categoría ───────────────────────────────────────────────────────────
 const CrearCategoria = ({ onCreated }) => {
   const [nombre, setNombre] = useState("");
+  const [tipo, setTipo] = useState("alojamiento");
   const [msg, setMsg] = useState("");
 
   const submit = async () => {
     if (!nombre.trim()) return;
     try {
-      await apiFetch("/categorias", { method: "POST", body: JSON.stringify({ nombre }) });
+      await apiFetch("/categorias", { method: "POST", body: JSON.stringify({ nombre, tipo }) });
       setNombre(""); setMsg("¡Categoría creada!"); onCreated();
     } catch (e) { setMsg(e.message); }
   };
 
   return (
-    <div style={{ display: "flex", gap: 8, marginBottom: "1.5rem", alignItems: "flex-end" }}>
-      <div style={{ flex: 1 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 180px auto", gap: 8, marginBottom: "1.5rem", alignItems: "end" }}>
+      <div>
         <label className="form-label">Nueva categoría</label>
         <input
           className="form-input"
@@ -31,6 +37,13 @@ const CrearCategoria = ({ onCreated }) => {
           onChange={(e) => setNombre(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
         />
+      </div>
+      <div>
+        <label className="form-label">Tipo</label>
+        <select className="form-input form-select" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+          <option value="alojamiento">Alojamiento</option>
+          <option value="unidad">Unidad</option>
+        </select>
       </div>
       <button className="btn btn-primary btn-sm" onClick={submit} style={{ height: 42 }}>Agregar</button>
       {msg && <span style={{ fontSize: "0.8rem", color: "var(--green)" }}>{msg}</span>}
@@ -53,15 +66,16 @@ const PagePanel = ({ user }) => {
   const loadTab = useCallback(async (t) => {
     setLoading(true); setMsg("");
     try {
-      if (t === "reservas")    { const d = await apiFetch("/reservas/mine"); setReservas(Array.isArray(d) ? d : []); }
-      if (t === "alojamientos"){ const d = await apiFetch("/alojamientos"); setAlojamientos(Array.isArray(d) ? d : []); }
-      if (t === "pagos")       { const d = await apiFetch("/pagos"); setPagos(Array.isArray(d) ? d : []); }
-      if (t === "usuarios" && user.rol === "admin") { const d = await apiFetch("/usuarios"); setUsuarios(Array.isArray(d) ? d : []); }
-      if (t === "categorias")  { const d = await apiFetch("/categorias"); setCategorias(Array.isArray(d) ? d : []); }
+      if (t === "reservas")    { await useReservasStore.getState().fetchMine(); setReservas(useReservasStore.getState().mine || []); }
+      if (t === "alojamientos"){ if (user.rol === "anfitrion") await useAlojamientosStore.getState().fetchMine(); else await useAlojamientosStore.getState().fetchAlojamientos(); setAlojamientos(useAlojamientosStore.getState().items || []); }
+      if (t === "pagos")       { await usePagosStore.getState().fetchPagos(); setPagos(usePagosStore.getState().pagos || []); }
+      if (t === "usuarios" && user.rol === "admin") { await useUsuariosStore.getState().fetchUsuarios(); setUsuarios(useUsuariosStore.getState().usuarios || []); }
+      if (t === "categorias")  { await useCategoriasStore.getState().fetchCategorias("todas", true); setCategorias(useCategoriasStore.getState().porTipo.todas.items || []); }
     } catch (e) { setMsg(e.message); }
     finally { setLoading(false); }
   }, [user]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadTab(tab); }, [tab, loadTab]);
 
   const cancelReserva = async (id) => {
@@ -71,7 +85,7 @@ const PagePanel = ({ user }) => {
 
   const deleteAlojamiento = async (id) => {
     if (!confirm("¿Eliminar este alojamiento?")) return;
-    try { await apiFetch(`/alojamientos/${id}`, { method: "DELETE" }); loadTab("alojamientos"); }
+    try { await useAlojamientosStore.getState().removeAlojamiento(id); loadTab("alojamientos"); }
     catch (e) { setMsg(e.message); }
   };
 
@@ -85,7 +99,9 @@ const PagePanel = ({ user }) => {
       { id: "unidades", label: "Unidades", icon: BedIcon },
     ] : []),
     { id: "pagos", label: "Pagos", icon: PaymentIcon },
-    { id: "categorias", label: "Categorías", icon: TagIcon },
+    ...(user.rol === "admin" ? [
+      { id: "categorias", label: "Categorías", icon: TagIcon },
+    ] : []),
     ...(user.rol === "admin" ? [
       { id: "alojamientos", label: "Alojamientos", icon: HomeIcon },
       { id: "usuarios", label: "Usuarios", icon: GroupIcon },
@@ -211,7 +227,7 @@ const PagePanel = ({ user }) => {
                 {categorias.length === 0 ? <EmptyState icon={<TagIcon fontSize="inherit" />} message="Sin categorías" /> : (
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {categorias.map((c) => (
-                      <span key={c.id} className="badge badge-green" style={{ padding: "6px 14px", fontSize: "0.875rem" }}>{c.nombre}</span>
+                      <span key={c.id} className={`badge ${c.tipo === "unidad" ? "badge-teal" : "badge-green"}`} style={{ padding: "6px 14px", fontSize: "0.875rem" }}>{c.nombre} · {c.tipo}</span>
                     ))}
                   </div>
                 )}

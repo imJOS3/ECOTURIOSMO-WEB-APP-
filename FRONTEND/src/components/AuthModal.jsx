@@ -1,6 +1,6 @@
 // src/components/AuthModal.jsx
 import { useState } from "react";
-import { apiFetch } from "../utils/api";
+import useAuthStore from "../stores/useAuthStore";
 import { CloseIcon, UserIcon, HomeIcon } from "./icons";
 
 const AuthModal = ({ mode: initialMode, onClose, onAuth }) => {
@@ -25,27 +25,25 @@ const AuthModal = ({ mode: initialMode, onClose, onAuth }) => {
     return "";
   };
 
+  const login = useAuthStore((s) => s.login);
+  const register = useAuthStore((s) => s.register);
+
   const submit = async () => {
     setError(""); setLoading(true);
     try {
       if (mode === "login") {
-        const data = await apiFetch("/auth/login", {
-          method: "POST",
-          body: JSON.stringify({ email: form.email, password: form.password }),
-        });
-        localStorage.setItem("eco_token", data.token);
-        localStorage.setItem("eco_user", JSON.stringify(data.user));
-        onAuth(data.user);
+        const user = await login(form.email, form.password);
+        onAuth && onAuth(user);
       } else {
         const passwordError = validateStrongPassword(form.password);
         if (passwordError) {
           setError(passwordError);
           return;
         }
-        await apiFetch("/auth/register", { method: "POST", body: JSON.stringify(form) });
+        await register(form);
         setMode("login"); setError("");
       }
-    } catch (e) { setError(e.message); }
+    } catch (e) { setError(e.message || String(e)); }
     finally { setLoading(false); }
   };
 

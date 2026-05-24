@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../utils/api";
 import { CloseIcon, SuccessIcon } from "./icons";
+import UnidadCard from "./UnidadCard";
+import { imagenesService } from "../services/imagenes.service";
 
 const ReserveModal = ({ alojamiento, onClose }) => {
   const [unidades, setUnidades] = useState([]);
@@ -14,7 +16,18 @@ const ReserveModal = ({ alojamiento, onClose }) => {
 
   useEffect(() => {
     apiFetch(`/unidades/alojamiento/${alojamiento.id}`)
-      .then((d) => setUnidades(Array.isArray(d.data) ? d.data : []))
+      .then(async (d) => {
+        const list = Array.isArray(d.data) ? d.data : [];
+        const withImages = await Promise.all(list.map(async (unidad) => {
+          try {
+            const images = await imagenesService.fetchUnidad(unidad.id);
+            return { ...unidad, imagenes: Array.isArray(images) ? images : Array.isArray(images?.data) ? images.data : [] };
+          } catch {
+            return unidad;
+          }
+        }));
+        setUnidades(withImages);
+      })
       .catch(() => {});
   }, [alojamiento.id]);
 
@@ -61,23 +74,16 @@ const ReserveModal = ({ alojamiento, onClose }) => {
             ) : (
               <>
                 <p className="form-label" style={{ marginBottom: "8px" }}>Selecciona una unidad</p>
-                {unidades.map((u) => (
-                  <div
-                    key={u.id}
-                    className={`unit-row ${selectedUnidad?.id === u.id ? "selected" : ""}`}
-                    onClick={() => setSelectedUnidad(u)}
-                  >
-                    <div>
-                      <span style={{ fontWeight: 500 }}>{u.nombre}</span>
-                      <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginLeft: 8 }}>
-                        {u.tipo} · Cap. {u.capacidad}{u.es_compartido ? " · compartido" : ""}
-                      </span>
-                    </div>
-                    <span style={{ color: "var(--green)", fontWeight: 500 }}>
-                      ${parseFloat(u.precio_noche || 0).toFixed(0)}/noche
-                    </span>
-                  </div>
-                ))}
+                <div className="unidad-grid">
+                  {unidades.map((u) => (
+                    <UnidadCard
+                      key={u.id}
+                      unidad={u}
+                      selected={selectedUnidad?.id === u.id}
+                      onClick={setSelectedUnidad}
+                    />
+                  ))}
+                </div>
 
                 <div className="form-row" style={{ marginTop: "1rem" }}>
                   <div className="form-group">

@@ -1,8 +1,12 @@
 // src/panels/TabAnfitrion.jsx
 import { useState, useEffect, useCallback } from "react";
-import { apiFetch } from "../utils/api";
+import useReservasStore from "../stores/useReservasStore";
+import { useAlojamientosStore } from "../stores/useAlojamientosStore";
+import { useUnidadesStore } from "../stores/useUnidadesStore";
 import { Badge, Spinner, EmptyState } from "../components/ui";
 import { UnidadForm } from "../components/AlojamientoForm";
+import UnidadCard from "../components/UnidadCard";
+import { imagenesService } from "../services/imagenes.service";
 import { CalendarIcon, HomeIcon, BedIcon, RefreshIcon, SuccessIcon, ErrorIcon, BackIcon } from "../components/icons";
 
 // ─── TabReservasAnfitrion ──────────────────────────────────────────────────────
@@ -16,18 +20,19 @@ export const TabReservasAnfitrion = () => {
   const load = useCallback(async () => {
     setLoading(true); setMsg("");
     try {
-      const d = await apiFetch("/reservas/anfitrion");
-      setReservas(Array.isArray(d) ? d : []);
+      await useReservasStore.getState().fetchAnfitrion();
+      setReservas(useReservasStore.getState().reservas || []);
     } catch (e) { setMsg(e.message); setMsgType("error"); }
     finally { setLoading(false); }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
 
   const cambiarEstado = async (id, estado) => {
     setMsg("");
     try {
-      await apiFetch(`/reservas/${id}`, { method: "PUT", body: JSON.stringify({ estado }) });
+      await useReservasStore.getState().updateReserva(id, { estado });
       setMsg(`Reserva ${estado === "confirmada" ? "confirmada" : "cancelada"} correctamente`);
       setMsgType("success");
       load();
@@ -120,27 +125,42 @@ export const TabMisUnidades = () => {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    apiFetch("/alojamientos/mine")
-      .then((d) => { setAlojamientos(Array.isArray(d) ? d : []); setLoading(false); })
-      .catch(() => {
-        apiFetch("/alojamientos")
-          .then((d) => { setAlojamientos(Array.isArray(d) ? d : []); setLoading(false); })
-          .catch(() => setLoading(false));
-      });
+    (async () => {
+      try {
+        await useAlojamientosStore.getState().fetchMine();
+        setAlojamientos(useAlojamientosStore.getState().items || []);
+      } catch {
+        try {
+          await useAlojamientosStore.getState().fetchAlojamientos();
+          setAlojamientos(useAlojamientosStore.getState().items || []);
+        } catch {
+          // ignore
+        }
+      } finally { setLoading(false); }
+    })();
   }, []);
 
   const loadUnidades = async (aloj) => {
     setSelectedAloj(aloj); setUnidades([]);
     try {
-      const d = await apiFetch(`/unidades/alojamiento/${aloj.id}`);
-      setUnidades(Array.isArray(d.data) ? d.data : []);
+      await useUnidadesStore.getState().fetchByAlojamiento(aloj.id);
+      const list = useUnidadesStore.getState().items || [];
+      const withImages = await Promise.all(list.map(async (unidad) => {
+        try {
+          const images = await imagenesService.fetchUnidad(unidad.id);
+          return { ...unidad, imagenes: Array.isArray(images) ? images : Array.isArray(images?.data) ? images.data : [] };
+        } catch {
+          return unidad;
+        }
+      }));
+      setUnidades(withImages);
     } catch (e) { setMsg(e.message); }
   };
 
   const deleteUnidad = async (id) => {
     if (!confirm("¿Eliminar esta unidad?")) return;
     try {
-      await apiFetch(`/unidades/${id}`, { method: "DELETE" });
+      await useUnidadesStore.getState().removeUnidad(id);
       loadUnidades(selectedAloj);
     } catch (e) { setMsg(e.message); }
   };
@@ -186,24 +206,18 @@ export const TabMisUnidades = () => {
                 {unidades.length === 0 ? (
                   <EmptyState icon={<BedIcon fontSize="inherit" />} message="Sin unidades. Agrega una." />
                 ) : (
-                  <div className="table-wrap">
-                    <table>
-                      <thead>
-                        <tr><th>Nombre</th><th>Tipo</th><th>Cap.</th><th>Precio/noche</th><th>Estado</th><th>Acción</th></tr>
-                      </thead>
-                      <tbody>
-                        {unidades.map((u) => (
-                          <tr key={u.id}>
-                            <td>{u.nombre}</td>
-                            <td>{u.tipo}</td>
-                            <td>{u.capacidad}</td>
-                            <td>${parseFloat(u.precio_noche || 0).toFixed(0)}</td>
-                            <td><Badge status={u.estado || u.estado_publicacion} /></td>
-                            <td><button className="btn btn-danger btn-sm" onClick={() => deleteUnidad(u.id)}>Eliminar</button></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="unidad-grid">
+                    {unidades.map((u) => (
+                      <UnidadCard
+                        key={u.id}
+                        unidad={u}
+                        actions={(
+                          <button className="btn btn-danger btn-sm" onClick={() => deleteUnidad(u.id)}>
+                            Eliminar
+                          </button>
+                        )}
+                      />
+                    ))}
                   </div>
                 )}
               </>

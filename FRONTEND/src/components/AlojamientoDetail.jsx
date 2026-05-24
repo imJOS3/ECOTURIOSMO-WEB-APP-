@@ -1,32 +1,45 @@
 // src/components/AlojamientoDetail.jsx
 import { useState, useEffect } from "react";
-import { apiFetch } from "../utils/api";
+import { useUnidadesStore } from "../stores/useUnidadesStore";
+import useResenasStore from "../stores/useResenasStore";
 import { Badge, StarRating } from "./ui";
-import { NatureIcons, BackIcon, MapIcon } from "./icons";
+import NatureIcons from "./icons.constants";
+import { BackIcon, MapIcon } from "./icons";
+import MediaGallery from "./MediaGallery";
+import { formatCurrency, getEntityCategories, getPrimaryImage } from "../utils/media";
+import { imagenesService } from "../services/imagenes.service";
 
 const randomIcon = (id) => NatureIcons[(id || 0) % NatureIcons.length];
 
 const AlojamientoDetail = ({ item, user, onBack, onReserve }) => {
   const [resenas, setResenas] = useState([]);
   const [unidades, setUnidades] = useState([]);
+  const [imagenes, setImagenes] = useState([]);
   const [newResena, setNewResena] = useState({ calificacion: 5, comentario: "" });
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    apiFetch(`/resenas/alojamiento/${item.id}`).then(setResenas).catch(() => {});
-    apiFetch(`/unidades/alojamiento/${item.id}`)
-      .then((d) => setUnidades(Array.isArray(d.data) ? d.data : []))
-      .catch(() => {});
+    (async () => {
+      try {
+        await useResenasStore.getState().fetchByAlojamiento(item.id);
+        setResenas(useResenasStore.getState().resenas || []);
+      } catch { /* ignore */ }
+      try {
+        await useUnidadesStore.getState().fetchByAlojamiento(item.id);
+        setUnidades(useUnidadesStore.getState().items || []);
+      } catch { /* ignore */ }
+      try {
+        const d = await imagenesService.fetchAlojamiento(item.id);
+        setImagenes(Array.isArray(d) ? d : Array.isArray(d?.data) ? d.data : []);
+      } catch { /* ignore */ }
+    })();
   }, [item.id]);
 
   const submitResena = async () => {
     try {
-      await apiFetch("/resenas", {
-        method: "POST",
-        body: JSON.stringify({ id_alojamiento: item.id, ...newResena }),
-      });
+      await useResenasStore.getState().createResena({ alojamiento_id: item.id, comentario: newResena.comentario, puntuacion: newResena.calificacion });
       setMsg("¡Reseña publicada!");
-      const updated = await apiFetch(`/resenas/alojamiento/${item.id}`);
+      const updated = await useResenasStore.getState().fetchByAlojamiento(item.id);
       setResenas(updated);
     } catch (e) { setMsg(e.message); }
   };
@@ -38,13 +51,7 @@ const AlojamientoDetail = ({ item, user, onBack, onReserve }) => {
       </button>
 
       <div className="detail-hero">
-        <div className="card-img-pattern" style={{ position: "absolute", inset: 0, opacity: 0.2 }} />
-        <span style={{ position: "relative", zIndex: 1, fontSize: "7rem" }}>
-          {(() => {
-            const Icon = randomIcon(item.id);
-            return <Icon fontSize="inherit" />;
-          })()}
-        </span>
+        <MediaGallery entity={item} images={imagenes} title={item.titulo} height={260} compact />
       </div>
 
       <div className="detail-layout">
@@ -52,23 +59,51 @@ const AlojamientoDetail = ({ item, user, onBack, onReserve }) => {
           <h1 className="display" style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>{item.titulo}</h1>
           <p style={{ color: "var(--text-muted)", marginBottom: "0.5rem", display: "inline-flex", alignItems: "center", gap: 6 }}><MapIcon fontSize="small" /> {item.ubicacion}</p>
           <Badge status={item.estado || item.estado_publicacion} />
+          {getEntityCategories(item).length > 0 && (
+            <div className="tag-row" style={{ marginTop: "0.9rem" }}>
+              {getEntityCategories(item).map((categoria) => (
+                <span key={categoria.id || categoria.nombre} className="tag-pill">{categoria.nombre}</span>
+              ))}
+            </div>
+          )}
           <p style={{ lineHeight: "1.8", margin: "1.5rem 0 2rem" }}>{item.descripcion}</p>
 
           {unidades.length > 0 && (
             <div style={{ marginBottom: "2rem" }}>
               <h3 className="display" style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>Unidades disponibles</h3>
               {unidades.map((u) => (
-                <div key={u.id} className="unit-row" style={{ cursor: "default" }}>
-                  <div>
-                    <span style={{ fontWeight: 500 }}>{u.nombre}</span>
-                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginLeft: 8 }}>
-                      {u.tipo} · Cap. {u.capacidad}{u.es_compartido ? " · compartido" : ""}
-                    </span>
+                <div key={u.id} className="unit-row unit-row-media" style={{ cursor: "default" }}>
+                  <div className="unit-row-image" style={{ backgroundImage: getPrimaryImage(u) ? `url(${getPrimaryImage(u)})` : undefined }}>
+                    {!getPrimaryImage(u) && (
+                      <span style={{ position: "relative", zIndex: 1 }}>
+                        {(() => {
+                          const Icon = randomIcon(u.id);
+                          return <Icon fontSize="inherit" />;
+                        })()}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
+                      <div>
+                        <span style={{ fontWeight: 500 }}>{u.nombre}</span>
+                        <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginLeft: 8 }}>
+                          {u.tipo} · Cap. {u.capacidad}{u.es_compartido ? " · compartido" : ""}
+                        </span>
+                      </div>
+                      <span style={{ color: "var(--green)", fontWeight: 500 }}>
+                        ${formatCurrency(u.precio_noche || 0)}/noche
+                      </span>
+                    </div>
+                    {getEntityCategories(u).length > 0 && (
+                      <div className="tag-row" style={{ marginTop: 8 }}>
+                        {getEntityCategories(u).slice(0, 4).map((categoria) => (
+                          <span key={categoria.id || categoria.nombre} className="tag-pill">{categoria.nombre}</span>
+                        ))}
+                      </div>
+                    )}
                     <div style={{ marginTop: 4 }}><Badge status={u.estado || u.estado_publicacion} /></div>
                   </div>
-                  <span style={{ color: "var(--green)", fontWeight: 500 }}>
-                    ${parseFloat(u.precio_noche || 0).toFixed(0)}/noche
-                  </span>
                 </div>
               ))}
             </div>
@@ -159,6 +194,10 @@ const AlojamientoDetail = ({ item, user, onBack, onReserve }) => {
                 <tr>
                   <td style={{ color: "var(--text-muted)", padding: "4px 0" }}>Unidades</td>
                   <td style={{ textAlign: "right" }}>{unidades.length}</td>
+                </tr>
+                <tr>
+                  <td style={{ color: "var(--text-muted)", padding: "4px 0" }}>Categorías</td>
+                  <td style={{ textAlign: "right" }}>{getEntityCategories(item).length}</td>
                 </tr>
               </tbody>
             </table>

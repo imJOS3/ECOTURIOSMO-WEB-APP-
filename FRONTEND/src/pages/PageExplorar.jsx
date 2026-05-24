@@ -1,24 +1,24 @@
 // src/pages/PageExplorar.jsx
 import { useState, useEffect } from "react";
-import { apiFetch } from "../utils/api";
 import AlojamientoCard from "../components/AlojamientoCard";
 import AlojamientoDetail from "../components/AlojamientoDetail";
 import ReserveModal from "../components/ReserveModal";
 import { Spinner, EmptyState } from "../components/ui";
 import { BrandIcon } from "../components/icons";
+import { useAlojamientosStore } from "../stores/useAlojamientosStore";
 
 const PageExplorar = ({ user, onRequireAuth }) => {
-  const [alojamientos, setAlojamientos] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
   const [reserveItem, setReserveItem] = useState(null);
+  const alojamientos = useAlojamientosStore((state) => state.items);
+  const loading = useAlojamientosStore((state) => state.loading);
+  const error = useAlojamientosStore((state) => state.error);
+  const fetchAlojamientos = useAlojamientosStore((state) => state.fetchAlojamientos);
 
   useEffect(() => {
-    apiFetch("/alojamientos")
-      .then((d) => { setAlojamientos(Array.isArray(d) ? d : []); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, []);
+    fetchAlojamientos().catch(() => {});
+  }, [fetchAlojamientos]);
 
   const filtered = alojamientos.filter(
     (a) =>
@@ -54,6 +54,7 @@ const PageExplorar = ({ user, onRequireAuth }) => {
         />
       </div>
       {loading ? <Spinner />
+        : error ? <div className="alert alert-error">{error}</div>
         : filtered.length === 0 ? <EmptyState icon={<BrandIcon fontSize="inherit" />} message="No se encontraron alojamientos" />
         : <div className="cards-grid">{filtered.map((a) => <AlojamientoCard key={a.id} item={a} onClick={setSelected} />)}</div>
       }
