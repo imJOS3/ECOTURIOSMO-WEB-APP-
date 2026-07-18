@@ -30,6 +30,17 @@ router.post(
   ctrl.create
 );
 
+// =========================
+// ACTUALIZAR
+// =========================
+
+router.put(
+  '/:id',
+  auth,
+  checkRole('anfitrion'),
+  upload.single('imagen'),
+  ctrl.update
+);
 
 // =========================
 // OBTENER IMAGENES

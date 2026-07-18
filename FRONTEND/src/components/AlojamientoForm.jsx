@@ -290,7 +290,7 @@ export const UnidadForm = ({ alojamientoId, onClose, onCreated, initialData = nu
         ? await updateUnidad(initialData.id, payload)
         : await createUnidad(payload);
 
-      const unidadId = saved?.id || initialData?.id;
+      const unidadId = saved?.data?.id || saved?.id || initialData?.id;
 
       if (unidadId && newFiles.length > 0) {
         setUploading(true);

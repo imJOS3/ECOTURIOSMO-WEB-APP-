@@ -44,3 +44,13 @@ export const deleteAlojamientoImagen = `
 DELETE FROM alojamiento_imagen
 WHERE id = $1;
 `;
+// =========================
+// ACTUALIZAR
+// =========================
+
+export const updateAlojamientoImagen = `
+UPDATE alojamiento_imagen
+SET url = $1, public_id = $2
+WHERE id = $3
+RETURNING *;
+`;

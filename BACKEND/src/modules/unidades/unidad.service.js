@@ -6,6 +6,8 @@ import * as q from './unidad.queries.js';
 
 import * as categoriaRelations from '../categorias/categoria.relations.service.js';
 
+import * as imagenService from './unidad-imagen/unidad-imagen.service.js'; // ⚠️ ajusta el path si es distinto
+
 
 // =========================
 // CREAR
@@ -466,6 +468,17 @@ export const remove = async (
   if (!isOwner && !isAdmin) {
     throw new Error('FORBIDDEN');
   }
+
+
+  // =========================
+  // BORRAR IMAGENES (Cloudinary + BD)
+  // =========================
+
+  const imagenes = await imagenService.getByUnidad(id);
+
+  await Promise.all(
+    imagenes.map((img) => imagenService.remove(img.id))
+  );
 
 
   // =========================

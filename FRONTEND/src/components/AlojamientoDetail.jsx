@@ -1,5 +1,6 @@
 // src/components/AlojamientoDetail.jsx
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useUnidadesStore } from "../stores/useUnidadesStore";
 import useResenasStore from "../stores/useResenasStore";
 import { Badge, StarRating } from "./ui";
@@ -12,6 +13,7 @@ import { imagenesService } from "../services/imagenes.service";
 const randomIcon = (id) => NatureIcons[(id || 0) % NatureIcons.length];
 
 const AlojamientoDetail = ({ item, user, onBack, onReserve }) => {
+  const navigate = useNavigate();
   const [resenas, setResenas] = useState([]);
   const [unidades, setUnidades] = useState([]);
   const [imagenes, setImagenes] = useState([]);
@@ -72,7 +74,11 @@ const AlojamientoDetail = ({ item, user, onBack, onReserve }) => {
             <div style={{ marginBottom: "2rem" }}>
               <h3 className="display" style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>Unidades disponibles</h3>
               {unidades.map((u) => (
-                <div key={u.id} className="unit-row unit-row-media" style={{ cursor: "default" }}>
+                <div
+                      key={u.id}
+                      className="unit-row unit-row-media"
+                      onClick={() => navigate(`/alojamientos/${item.id}/unidades/${u.id}`)}
+                    >
                   <div className="unit-row-image" style={{ backgroundImage: getPrimaryImage(u) ? `url(${getPrimaryImage(u)})` : undefined }}>
                     {!getPrimaryImage(u) && (
                       <span style={{ position: "relative", zIndex: 1 }}>

@@ -41,7 +41,40 @@ export const create = async (
   }
 };
 
+// =========================
+// ACTUALIZAR
+// =========================
 
+export const update = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Imagen requerida'
+      });
+    }
+
+    const data = await service.update(req.params.id, {
+      url: req.file.path,
+      public_id: req.file.filename
+    });
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: 'Imagen no encontrada'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
 // =========================
 // OBTENER POR ALOJAMIENTO
 // =========================

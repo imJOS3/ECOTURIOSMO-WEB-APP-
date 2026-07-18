@@ -2,6 +2,7 @@
 
 import pool from '../../config/database.js';
 import * as q from './alojamiento.queries.js';
+import * as imagenService from './alojamiento-imagen/alojamiento-imagen.service.js';
 import * as categoriaRelations from '../categorias/categoria.relations.service.js';
 
 export const create = async (data, user) => {
@@ -104,8 +105,17 @@ export const update = async (id, data) => {
   return categoriaRelations.attachAlojamientoCategorias(rows[0]);
 };
 
+
 export const remove = async (id) => {
+  // 1. Borrar todas las imágenes (Cloudinary + BD) reutilizando la lógica existente
+  const imagenes = await imagenService.getByAlojamiento(id);
+  await Promise.all(imagenes.map((img) => imagenService.remove(img.id)));
+
+  // 2. Borrar relaciones de categorías
   await categoriaRelations.setAlojamientoCategorias(id, []);
+
+  // 3. Borrar el alojamiento
   await pool.query(q.deleteAlojamiento, [id]);
+
   return { message: 'Eliminado correctamente' };
 };

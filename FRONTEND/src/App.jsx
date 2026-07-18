@@ -9,6 +9,8 @@ import PageHome from "./pages/PageHome";
 import PageExplorar from "./pages/PageExplorar";
 import PagePanel from "./pages/PagePanel";
 import { BrandIcon, LockIcon } from "./components/icons";
+import PageAlojamientoDetail from "./pages/PageAlojamientoDetail";
+import PageUnidadDetail from "./pages/PageUnidadDetail";
 
 /* ─── ESTILOS GLOBALES ────────────────────────────────────────────────────── */
 const styles = `
@@ -635,6 +637,22 @@ export default function App() {
             )}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route
+            path="/alojamientos/:id"
+            element={(
+              <div className="main">
+                <PageAlojamientoDetail user={user} onRequireAuth={onRequireAuth} />
+              </div>
+            )}
+          />
+          <Route
+            path="/alojamientos/:id/unidades/:unidadId"
+            element={(
+              <div className="main">
+                <PageUnidadDetail user={user} onRequireAuth={onRequireAuth} />
+              </div>
+            )}
+          />
         </Routes>
 
         <footer className="footer">

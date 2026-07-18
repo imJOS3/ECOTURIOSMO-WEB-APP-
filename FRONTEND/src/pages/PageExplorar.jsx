@@ -1,16 +1,13 @@
-// src/pages/PageExplorar.jsx
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AlojamientoCard from "../components/AlojamientoCard";
-import AlojamientoDetail from "../components/AlojamientoDetail";
-import ReserveModal from "../components/ReserveModal";
 import { Spinner, EmptyState } from "../components/ui";
 import { BrandIcon } from "../components/icons";
 import { useAlojamientosStore } from "../stores/useAlojamientosStore";
 
-const PageExplorar = ({ user, onRequireAuth }) => {
+const PageExplorar = ({ onRequireAuth }) => {
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState(null);
-  const [reserveItem, setReserveItem] = useState(null);
+  const navigate = useNavigate();
   const alojamientos = useAlojamientosStore((state) => state.items);
   const loading = useAlojamientosStore((state) => state.loading);
   const error = useAlojamientosStore((state) => state.error);
@@ -24,18 +21,6 @@ const PageExplorar = ({ user, onRequireAuth }) => {
     (a) =>
       a.titulo?.toLowerCase().includes(search.toLowerCase()) ||
       a.ubicacion?.toLowerCase().includes(search.toLowerCase())
-  );
-
-  if (selected) return (
-    <>
-      <AlojamientoDetail
-        item={selected}
-        user={user}
-        onBack={() => setSelected(null)}
-        onReserve={(item) => { if (!user) onRequireAuth(); else setReserveItem(item); }}
-      />
-      {reserveItem && <ReserveModal alojamiento={reserveItem} onClose={() => setReserveItem(null)} />}
-    </>
   );
 
   return (
@@ -56,7 +41,7 @@ const PageExplorar = ({ user, onRequireAuth }) => {
       {loading ? <Spinner />
         : error ? <div className="alert alert-error">{error}</div>
         : filtered.length === 0 ? <EmptyState icon={<BrandIcon fontSize="inherit" />} message="No se encontraron alojamientos" />
-        : <div className="cards-grid">{filtered.map((a) => <AlojamientoCard key={a.id} item={a} onClick={setSelected} />)}</div>
+        : <div className="cards-grid">{filtered.map((a) => <AlojamientoCard key={a.id} item={a} onClick={(it) => navigate(`/alojamientos/${it.id}`)} />)}</div>
       }
     </div>
   );
