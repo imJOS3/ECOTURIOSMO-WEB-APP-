@@ -1,7 +1,7 @@
 // src/pages/PageHome.jsx
 import { useState, useEffect } from "react";
 import { apiFetch } from "../utils/api";
-import AlojamientoCard from "../components/AlojamientoCard";
+import AlojamientoCard from "../components/Alojamiento/AlojamientoCard";
 import { HomeIcon, UserIcon, CalendarIcon, MapIcon, BrandIcon } from "../components/icons";
 
 const PLACEHOLDERS = [

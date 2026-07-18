@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../utils/api";
 import { CloseIcon, SuccessIcon } from "./icons";
-import UnidadCard from "./UnidadCard";
+import UnidadCard from "./Unidad/UnidadCard";
 import { imagenesService } from "../services/imagenes.service";
 
 const ReserveModal = ({ alojamiento, onClose }) => {

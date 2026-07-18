@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
-import UnidadDetail from "../components/UnidadDetail";
+import UnidadDetail from "../components/Unidad/UnidadDetail";
 import ReserveModal from "../components/ReserveModal";
 import { Spinner, EmptyState } from "../components/ui";
 import { BedIcon } from "../components/icons";

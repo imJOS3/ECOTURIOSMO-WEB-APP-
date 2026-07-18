@@ -4,8 +4,9 @@ import useReservasStore from "../stores/useReservasStore";
 import { useAlojamientosStore } from "../stores/useAlojamientosStore";
 import { useUnidadesStore } from "../stores/useUnidadesStore";
 import { Badge, Spinner, EmptyState } from "../components/ui";
-import { UnidadForm } from "../components/AlojamientoForm";
-import UnidadCard from "../components/UnidadCard";
+import { AlojamientoForm } from "../components/Alojamiento/AlojamientoForm";
+import { UnidadForm } from "../components/Unidad/UnidadForm";
+import UnidadCard from "../components/Unidad/UnidadCard";
 import { imagenesService } from "../services/imagenes.service";
 import { CalendarIcon, HomeIcon, BedIcon, RefreshIcon, SuccessIcon, ErrorIcon, BackIcon } from "../components/icons";
 

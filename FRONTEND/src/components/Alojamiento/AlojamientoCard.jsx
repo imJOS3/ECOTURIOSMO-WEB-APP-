@@ -1,7 +1,7 @@
 // src/components/AlojamientoCard.jsx
-import { Badge } from "./ui";
-import NatureIcons from "./icons.constants";
-import { formatCurrency, getEntityCategories, getPrimaryImage } from "../utils/media";
+import { Badge } from "../ui";
+import NatureIcons from "../icons.constants";
+import { formatCurrency, getEntityCategories, getPrimaryImage } from "../../utils/media";
 
 const randomIcon = (id) => NatureIcons[(id || 0) % NatureIcons.length];
 

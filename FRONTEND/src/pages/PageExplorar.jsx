@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AlojamientoCard from "../components/AlojamientoCard";
+import AlojamientoCard from "../components/Alojamiento/AlojamientoCard";
 import { Spinner, EmptyState } from "../components/ui";
 import { BrandIcon } from "../components/icons";
 import { useAlojamientosStore } from "../stores/useAlojamientosStore";

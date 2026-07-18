@@ -1,5 +1,5 @@
-import { Badge } from "./ui";
-import { formatCurrency, getEntityCategories, getPrimaryImage } from "../utils/media";
+import { Badge } from "../ui";
+import { formatCurrency, getEntityCategories, getPrimaryImage } from "../../utils/media";
 
 const UnidadCard = ({ unidad, onClick, selected = false, actions = null }) => {
   const image = getPrimaryImage(unidad);

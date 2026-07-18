@@ -7,7 +7,7 @@ import usePagosStore from "../stores/usePagosStore";
 import useUsuariosStore from "../stores/useUsuariosStore";
 import { useCategoriasStore } from "../stores/useCategoriasStore";
 import { Badge, Spinner, EmptyState } from "../components/ui";
-import { AlojamientoForm } from "../components/AlojamientoForm";
+import { AlojamientoForm } from "../components/Alojamiento/AlojamientoForm";
 import { TabModeracion, TabModeracionLog } from "../panels/TabModeracion";
 import { TabReservasAnfitrion, TabMisUnidades } from "../panels/TabAnfitrion";
 import { CalendarIcon, HomeIcon, BedIcon, PaymentIcon, TagIcon, GroupIcon, AdminIcon, ReviewIcon } from "../components/icons";

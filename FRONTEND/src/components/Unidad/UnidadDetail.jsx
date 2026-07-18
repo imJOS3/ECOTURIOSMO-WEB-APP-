@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import useResenasStore from "../stores/useResenasStore";
-import { Badge, StarRating } from "./ui";
-import { BackIcon, MapIcon } from "./icons";
-import MediaGallery from "./MediaGallery";
-import { formatCurrency, getEntityCategories } from "../utils/media";
-import { imagenesService } from "../services/imagenes.service";
-import { apiFetch } from "../utils/api";
+import useResenasStore from "../../stores/useResenasStore";
+import { Badge, StarRating } from "../ui";
+import { BackIcon, MapIcon } from "../icons";
+import MediaGallery from "../MediaGallery";
+import { formatCurrency, getEntityCategories } from "../../utils/media";
+import { imagenesService } from "../../services/imagenes.service";
+import { apiFetch } from "../../utils/api";
 
 const UnidadDetail = ({ unidad, user, onBack, onReserve }) => {
   const [alojamiento, setAlojamiento] = useState(null);
