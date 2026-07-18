@@ -1,63 +1,44 @@
 import { apiFetch, apiUpload } from "../utils/api";
 
-const buildImageFormData = (files) => {
-  const formData = new FormData();
-  files.forEach((file) => {
-    formData.append("imagenes", file);
-  });
-  return formData;
-};
-
-const uploadLegacyImages = async (path, files) => {
-  const results = [];
-  for (const file of files) {
-    const legacyFormData = new FormData();
-    legacyFormData.append("imagen", file);
-    const result = await apiUpload(path, legacyFormData);
-    results.push(result);
-  }
-  return results;
-};
-
-const fetchWithFallback = async (preferred, fallback) => {
-  try {
-    return await apiFetch(preferred);
-  } catch (preferredError) {
-    if (!fallback) throw preferredError;
-    return apiFetch(fallback);
-  }
-};
-
-const uploadWithFallback = async ({ preferred, fallback, files }) => {
-  try {
-    return await apiUpload(preferred, buildImageFormData(files));
-  } catch (preferredError) {
-    if (!fallback) throw preferredError;
-    return uploadLegacyImages(fallback, files);
-  }
+// Sube varios archivos en paralelo, uno por request, respetando el
+// contrato actual del backend: campo "imagen" (singular) + el id de
+// la entidad dueña en el body (requerido por el schema de validación).
+const uploadImages = async (path, files, ownerField, ownerId) => {
+  return Promise.all(
+    files.map((file) => {
+      const formData = new FormData();
+      formData.append("imagen", file);
+      formData.append(ownerField, ownerId);
+      return apiUpload(path, formData);
+    })
+  );
 };
 
 export const imagenesService = {
-  fetchAlojamiento: (id) => fetchWithFallback(
-    `/alojamientos/${id}/imagenes`,
-    `/alojamiento-imagen/alojamiento/${id}`
-  ),
-  fetchUnidad: (id) => fetchWithFallback(
-    `/unidades/${id}/imagenes`,
-    `/unidad-imagen/unidad/${id}`
-  ),
-  uploadAlojamiento: (id, files) => uploadWithFallback({
-    preferred: `/alojamientos/${id}/imagenes`,
-    fallback: "/alojamiento-imagen",
-    files,
-  }),
-  uploadUnidad: (id, files) => uploadWithFallback({
-    preferred: `/unidades/${id}/imagenes`,
-    fallback: "/unidad-imagen",
-    files,
-  }),
-  deleteAlojamiento: (idAlojamiento, imageId) => apiFetch(`/alojamientos/${idAlojamiento}/imagenes/${imageId}`, { method: "DELETE" })
-    .catch(() => apiFetch(`/alojamiento-imagen/${imageId}`, { method: "DELETE" })),
-  deleteUnidad: (idUnidad, imageId) => apiFetch(`/unidades/${idUnidad}/imagenes/${imageId}`, { method: "DELETE" })
-    .catch(() => apiFetch(`/unidad-imagen/${imageId}`, { method: "DELETE" })),
+  // =========================
+  // FETCH
+  // =========================
+  fetchAlojamiento: (id) =>
+    apiFetch(`/alojamiento-imagen/alojamiento/${id}`),
+
+  fetchUnidad: (id) =>
+    apiFetch(`/unidad-imagen/unidad/${id}`),
+
+  // =========================
+  // UPLOAD
+  // =========================
+  uploadAlojamiento: (id, files) =>
+    uploadImages("/alojamiento-imagen", files, "id_alojamiento", id),
+
+  uploadUnidad: (id, files) =>
+    uploadImages("/unidad-imagen", files, "id_unidad", id),
+
+  // =========================
+  // DELETE
+  // =========================
+  deleteAlojamiento: (idAlojamiento, imageId) =>
+    apiFetch(`/alojamiento-imagen/${imageId}`, { method: "DELETE" }),
+
+  deleteUnidad: (idUnidad, imageId) =>
+    apiFetch(`/unidad-imagen/${imageId}`, { method: "DELETE" }),
 };

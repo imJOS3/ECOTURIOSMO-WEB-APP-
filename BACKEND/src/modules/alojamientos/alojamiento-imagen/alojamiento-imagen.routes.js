@@ -25,8 +25,8 @@ router.post(
   '/',
   auth,
   checkRole('anfitrion'),
-  upload.single('imagen'),
   validate(createAlojamientoImagenSchema),
+  upload.single('imagen'),
   ctrl.create
 );
 

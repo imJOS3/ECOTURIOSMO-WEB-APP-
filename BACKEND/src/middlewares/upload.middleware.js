@@ -23,8 +23,27 @@ const storage = new CloudinaryStorage({
   }
 });
 
+const fileFilter = (req, file, cb) => {
+
+  const allowedMimes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp'
+  ];
+
+  if (allowedMimes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Formato de archivo no permitido'), false);
+  }
+};
+
 const upload = multer({
-  storage
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  },
+  fileFilter
 });
 
 export default upload;

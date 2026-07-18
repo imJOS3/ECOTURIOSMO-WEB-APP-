@@ -25,8 +25,8 @@ router.post(
   '/',
   auth,
   checkRole('anfitrion'),
-  upload.single('imagen'),
-  validate(createUnidadImagenSchema),
+  validate(createUnidadImagenSchema), 
+  upload.single('imagen'),            
   ctrl.create
 );
 

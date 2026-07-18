@@ -10,23 +10,18 @@ import cloudinary from '../../../config/cloudinary.js';
 // =========================
 
 export const create = async (data) => {
+  const { id_alojamiento, url, public_id } = data;
 
-  const {
-    id_alojamiento,
-    url,
-    public_id
-  } = data;
-
-  const { rows } = await pool.query(
-    q.createAlojamientoImagen,
-    [
-      id_alojamiento,
-      url,
-      public_id
-    ]
-  );
-
-  return rows[0];
+  try {
+    const { rows } = await pool.query(
+      q.createAlojamientoImagen,
+      [id_alojamiento, url, public_id]
+    );
+    return rows[0];
+  } catch (err) {
+    await cloudinary.uploader.destroy(public_id).catch(() => {});
+    throw err;
+  }
 };
 
 

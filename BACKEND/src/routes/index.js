@@ -29,12 +29,12 @@ router.use('/categorias', categoriaRoutes);
 router.use('/admin/moderacion', moderacionRoutes);
 
 router.use(
-  '/api/unidad-imagen',
+  '/unidad-imagen',
   unidadImagenRoutes
 );
 
 router.use(
-  '/api/alojamiento-imagen',
+  '/alojamiento-imagen',
   alojamientoImagenRoutes
 );
 

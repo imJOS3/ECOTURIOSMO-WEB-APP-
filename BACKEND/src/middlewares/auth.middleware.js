@@ -11,7 +11,10 @@ export default (req, res, next) => {
     const decoded = verifyToken(token);
     req.user = decoded;
     next();
-  } catch {
-    res.status(403).json({ message: 'Token inválido' });
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expirado' });
+    }
+    return res.status(403).json({ message: 'Token inválido' });
   }
 };
