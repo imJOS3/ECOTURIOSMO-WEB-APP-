@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { CloseIcon, RefreshIcon, CalendarIcon } from "../icons";
-import CategoryPicker from "../CategoryPicker";
-import ImageUploader from "../ImageUploader";
+import { CloseIcon, RefreshIcon, CalendarIcon } from "../common/icons/icons";
+import CategoryPicker from "./CategoryPicker";
+import ImageUploader from "../common/ImageUploader";
 import { useAlojamientosStore } from "../../stores/useAlojamientosStore";
 import { useImagenesStore } from "../../stores/useImagenesStore";
 import { baseAlojamiento, normalizeAlojamientoImages } from "../../utils/formHelpers";

@@ -1,7 +1,7 @@
 // src/components/AuthModal.jsx
 import { useState } from "react";
-import useAuthStore from "../stores/useAuthStore";
-import { CloseIcon, UserIcon, HomeIcon } from "./icons";
+import useAuthStore from "../../stores/useAuthStore";
+import { CloseIcon, UserIcon, HomeIcon } from "../common/icons/icons";
 
 const AuthModal = ({ mode: initialMode, onClose, onAuth }) => {
   const [mode, setMode] = useState(initialMode || "login");

@@ -1,9 +1,8 @@
-// src/panels/TabModeracion.jsx
 import { useState, useEffect, useCallback } from "react";
-import useModeracionStore from "../stores/useModeracionStore";
-import { apiFetch } from "../utils/api";
-import { Badge, Spinner, EmptyState } from "../components/ui";
-import { SuccessIcon, ErrorIcon, RefreshIcon, ReviewIcon, CalendarIcon } from "../components/icons";
+import useModeracionStore from "../../stores/useModeracionStore";
+import { apiFetch } from "../../utils/api";
+import { Badge, Spinner, EmptyState } from "../common/ui/index";
+import { SuccessIcon, ErrorIcon, RefreshIcon, ReviewIcon, CalendarIcon } from "../common/icons/icons";
 
 // ─── TabModeracion ─────────────────────────────────────────────────────────────
 export const TabModeracion = ({ tipoInicial = "alojamientos" }) => {

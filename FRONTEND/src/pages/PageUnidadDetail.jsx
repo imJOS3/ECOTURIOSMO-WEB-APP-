@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
 import UnidadDetail from "../components/Unidad/UnidadDetail";
-import ReserveModal from "../components/ReserveModal";
-import { Spinner, EmptyState } from "../components/ui";
-import { BedIcon } from "../components/icons";
+import ReserveModal from "../components/Unidad/ReserveModal";
+import { Spinner, EmptyState } from "../components/common/ui/index";
+import { BedIcon } from "../components/common/icons/icons";
 
 const PageUnidadDetail = ({ user, onRequireAuth }) => {
   const { id, unidadId } = useParams();

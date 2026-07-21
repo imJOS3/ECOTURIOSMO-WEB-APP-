@@ -1,14 +1,13 @@
-// src/panels/TabAnfitrion.jsx
 import { useState, useEffect, useCallback } from "react";
-import useReservasStore from "../stores/useReservasStore";
-import { useAlojamientosStore } from "../stores/useAlojamientosStore";
-import { useUnidadesStore } from "../stores/useUnidadesStore";
-import { Badge, Spinner, EmptyState } from "../components/ui";
-import { AlojamientoForm } from "../components/Alojamiento/AlojamientoForm";
-import { UnidadForm } from "../components/Unidad/UnidadForm";
-import UnidadCard from "../components/Unidad/UnidadCard";
-import { imagenesService } from "../services/imagenes.service";
-import { CalendarIcon, HomeIcon, BedIcon, RefreshIcon, SuccessIcon, ErrorIcon, BackIcon } from "../components/icons";
+import useReservasStore from "../../stores/useReservasStore";
+import { useAlojamientosStore } from "../../stores/useAlojamientosStore";
+import { useUnidadesStore } from "../../stores/useUnidadesStore";
+import { Badge, Spinner, EmptyState } from "../common/ui/index";
+import { AlojamientoForm } from "../Alojamiento/AlojamientoForm";
+import { UnidadForm } from "../Unidad/UnidadForm";
+import UnidadCard from "../Unidad/UnidadCard";
+import { imagenesService } from "../../services/imagenes.service";
+import { CalendarIcon, HomeIcon, BedIcon, RefreshIcon, SuccessIcon, ErrorIcon, BackIcon } from "../common/icons/icons";
 
 // ─── TabReservasAnfitrion ──────────────────────────────────────────────────────
 export const TabReservasAnfitrion = () => {

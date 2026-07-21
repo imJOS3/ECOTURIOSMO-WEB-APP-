@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUnidadesStore } from "../../stores/useUnidadesStore";
 import useResenasStore from "../../stores/useResenasStore";
-import { Badge, StarRating } from "../ui";
-import NatureIcons from "../icons.constants";
-import { BackIcon, MapIcon } from "../icons";
-import MediaGallery from "../MediaGallery";
+import { Badge, StarRating } from "../common/ui/index";
+import NatureIcons from "../common/icons/icons.constants";
+import { BackIcon, MapIcon } from "../common/icons/icons";
+import MediaGallery from "../common/MediaGallery";
 import { formatCurrency, getEntityCategories, getPrimaryImage } from "../../utils/media";
 import { imagenesService } from "../../services/imagenes.service";
 

@@ -1,17 +1,20 @@
-// src/App.jsx — Punto de entrada principal
+
 import { useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { getUser } from "./utils/api";
 import { useTheme } from "./hooks/useTheme";
-import Navbar from "./components/Navbar";
-import AuthModal from "./components/AuthModal";
+import Navbar from "./components/layout/Navbar";
+import AuthModal from "./components/auth/AuthModal";
 import PageHome from "./pages/PageHome";
 import PageExplorar from "./pages/PageExplorar";
 import PagePanel from "./pages/PagePanel";
-import { BrandIcon, LockIcon } from "./components/icons";
+import { BrandIcon, LockIcon } from "./components/common/icons/icons";
 import PageAlojamientoDetail from "./pages/PageAlojamientoDetail";
 import PageUnidadDetail from "./pages/PageUnidadDetail";
+import AlojamientoFormPage from "./pages/AlojamientoFormPage";
+import PageUnidadForm from "./pages/PageUnidadForm";
 import "./styles/global.css";
+
 
 /* ─── App Root ────────────────────────────────────────────────────────────── */
 export default function App() {
@@ -74,6 +77,10 @@ export default function App() {
               </div>
             )}
           />
+          <Route path="/panel/alojamientos/nuevo" element={<AlojamientoFormPage />} />
+          <Route path="/panel/alojamientos/:id/editar" element={<AlojamientoFormPage />} />   
+          <Route path="/panel/alojamientos/:alojamientoId/unidades/nueva" element={<PageUnidadForm />} />
+          <Route path="/panel/alojamientos/:alojamientoId/unidades/:id/editar" element={<PageUnidadForm />} />
           <Route
             path="/panel"
             element={user ? (

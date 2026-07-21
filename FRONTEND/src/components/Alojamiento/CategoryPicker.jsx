@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useCategoriasStore } from "../stores/useCategoriasStore";
+import { useCategoriasStore } from "../../stores/useCategoriasStore";
 
 const CategoryPicker = ({
   tipo,

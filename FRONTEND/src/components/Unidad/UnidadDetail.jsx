@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useResenasStore from "../../stores/useResenasStore";
-import { Badge, StarRating } from "../ui";
-import { BackIcon, MapIcon } from "../icons";
-import MediaGallery from "../MediaGallery";
+import { Badge, StarRating } from "../common/ui/index";
+import { BackIcon, MapIcon } from "../common/icons/icons";
+import MediaGallery from "../common/MediaGallery";
 import { formatCurrency, getEntityCategories } from "../../utils/media";
 import { imagenesService } from "../../services/imagenes.service";
 import { apiFetch } from "../../utils/api";

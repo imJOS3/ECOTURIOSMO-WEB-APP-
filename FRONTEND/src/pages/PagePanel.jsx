@@ -1,4 +1,3 @@
-// src/pages/PagePanel.jsx
 import { useState, useCallback, useEffect } from "react";
 import { apiFetch } from "../utils/api";
 import useReservasStore from "../stores/useReservasStore";
@@ -6,11 +5,11 @@ import { useAlojamientosStore } from "../stores/useAlojamientosStore";
 import usePagosStore from "../stores/usePagosStore";
 import useUsuariosStore from "../stores/useUsuariosStore";
 import { useCategoriasStore } from "../stores/useCategoriasStore";
-import { Badge, Spinner, EmptyState } from "../components/ui";
+import { Badge, Spinner, EmptyState } from "../components/common/ui/index";
 import { AlojamientoForm } from "../components/Alojamiento/AlojamientoForm";
-import { TabModeracion, TabModeracionLog } from "../panels/TabModeracion";
-import { TabReservasAnfitrion, TabMisUnidades } from "../panels/TabAnfitrion";
-import { CalendarIcon, HomeIcon, BedIcon, PaymentIcon, TagIcon, GroupIcon, AdminIcon, ReviewIcon } from "../components/icons";
+import { TabModeracion, TabModeracionLog } from "../components/panels/TabModeracion";
+import { TabReservasAnfitrion, TabMisUnidades } from "../components/panels/TabAnfitrion";
+import { CalendarIcon, HomeIcon, BedIcon, PaymentIcon, TagIcon, GroupIcon, AdminIcon, ReviewIcon } from "../components/common/icons/icons";
 
 // ─── Crear Categoría ───────────────────────────────────────────────────────────
 const CrearCategoria = ({ onCreated }) => {

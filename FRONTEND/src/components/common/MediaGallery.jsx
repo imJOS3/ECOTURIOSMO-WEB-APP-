@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { BrandIcon } from "./icons";
-import { getPrimaryImage, normalizeImages } from "../utils/media";
+import { BrandIcon } from "./icons/icons";
+import { getPrimaryImage, normalizeImages } from "../../utils/media";
 
 const MediaGallery = ({
   entity,

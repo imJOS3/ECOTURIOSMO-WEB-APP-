@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { CloseIcon } from "../icons";
-import CategoryPicker from "../CategoryPicker";
-import ImageUploader from "../ImageUploader";
+import { CloseIcon } from "../common/icons/icons";
+import CategoryPicker from "../Alojamiento/CategoryPicker";
+import ImageUploader from "../common/ImageUploader";
 import { useUnidadesStore } from "../../stores/useUnidadesStore";
 import { useImagenesStore } from "../../stores/useImagenesStore";
 import { baseUnidad, normalizeUnidadImages } from "../../utils/formHelpers";

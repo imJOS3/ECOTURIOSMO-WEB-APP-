@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CloseIcon } from "./icons";
+import { CloseIcon } from "./icons/icons";
 
 const MAX_SIZE_MB = 5;
 const MAX_FILES = 10;

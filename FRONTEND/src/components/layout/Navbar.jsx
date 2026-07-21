@@ -1,6 +1,5 @@
-// src/components/Navbar.jsx
 
-import { BrandIcon, ExplorerIcon, HomeIcon } from "./icons";
+import { BrandIcon, ExplorerIcon, HomeIcon } from "../common/icons/icons";
 import LightModeOutlined from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlined from "@mui/icons-material/DarkModeOutlined";
 

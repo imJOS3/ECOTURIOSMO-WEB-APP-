@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AlojamientoCard from "../components/Alojamiento/AlojamientoCard";
-import { Spinner, EmptyState } from "../components/ui";
-import { BrandIcon } from "../components/icons";
+import { Spinner, EmptyState } from "../components/common/ui/index";
+import { BrandIcon } from "../components/common/icons/icons";
 import { useAlojamientosStore } from "../stores/useAlojamientosStore";
 
 const PageExplorar = ({ onRequireAuth }) => {
