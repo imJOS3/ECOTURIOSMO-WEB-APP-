@@ -5,14 +5,14 @@ import { getUser } from "./utils/api";
 import { useTheme } from "./hooks/useTheme";
 import Navbar from "./components/layout/Navbar";
 import AuthModal from "./components/auth/AuthModal";
-import PageHome from "./pages/PageHome";
-import PageExplorar from "./pages/PageExplorar";
-import PagePanel from "./pages/PagePanel";
+import PageHome from "./pages/home/PageHome";
+import PageExplorar from "./pages/Discover/PageExplorar";
+import PagePanel from "./pages/Panel/PagePanel";
 import { BrandIcon, LockIcon } from "./components/common/icons/icons";
-import PageAlojamientoDetail from "./pages/PageAlojamientoDetail";
-import PageUnidadDetail from "./pages/PageUnidadDetail";
-import AlojamientoFormPage from "./pages/AlojamientoFormPage";
-import PageUnidadForm from "./pages/PageUnidadForm";
+import PageAlojamientoDetail from "./pages/Alojamiento/PageAlojamientoDetail";
+import PageUnidadDetail from "./pages/Unidad/PageUnidadDetail";
+import AlojamientoFormPage from "./pages/Alojamiento/AlojamientoFormPage";
+import PageUnidadForm from "./pages/Unidad/PageUnidadForm";
 import "./styles/global.css";
 
 

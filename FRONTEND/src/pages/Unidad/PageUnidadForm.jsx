@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { CalendarIcon, BackIcon } from "../components/common/icons/icons";
-import { useUnidadesStore } from "../stores/useUnidadesStore";
+import { CalendarIcon, BackIcon } from "../../components/common/icons/icons";
+import { useUnidadesStore } from "../../stores/useUnidadesStore";
 
-import { useInitialUnidad } from "../components/Unidad/form/useInitialUnidad";
-import { useUnidadForm } from "../components/Unidad/form/useUnidadForm";
-import { useImageGallery } from "../components/common/imageGallery/useImageGallery";
-import UnidadInfoSection from "../components/Unidad/form/UnidadInfoSection";
-import UnidadDetailsSection from "../components/Unidad/form/UnidadDetailsSection";
-import UnidadCategoriesSection from "../components/Unidad/form/UnidadCategoriesSection";
-import ImageGallerySection from "../components/common/imageGallery/ImageGallerySection";
-import UnidadPreviewSidebar from "../components/Unidad/form/UnidadPreviewSidebar";
+import { useInitialUnidad } from "../../components/Unidad/form/useInitialUnidad";
+import { useUnidadForm } from "../../components/Unidad/form/useUnidadForm";
+import { useImageGallery } from "../../components/common/imageGallery/useImageGallery";
+import UnidadInfoSection from "../../components/Unidad/form/UnidadInfoSection";
+import UnidadDetailsSection from "../../components/Unidad/form/UnidadDetailsSection";
+import UnidadCategoriesSection from "../../components/Unidad/form/UnidadCategoriesSection";
+import ImageGallerySection from "../../components/common/imageGallery/ImageGallerySection";
+import UnidadPreviewSidebar from "../../components/Unidad/form/UnidadPreviewSidebar";
 
 export const PageUnidadForm = () => {
   const navigate = useNavigate();

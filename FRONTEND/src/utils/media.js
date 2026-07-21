@@ -21,7 +21,7 @@ export const normalizeImages = (entity) => {
   if (!entity) return [];
 
   const directList = IMAGE_KEYS.flatMap((key) => toArray(entity[key]));
-  const nestedList = [entity.imagenes, entity.imagenes_relacionadas, entity.gallery]
+  const nestedList = [entity.imagenes_relacionadas, entity.gallery]
     .flatMap((entry) => toArray(entry));
 
   const images = [...directList, ...nestedList].filter(Boolean);

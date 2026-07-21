@@ -1,10 +1,13 @@
 que se realizo hoy
--subir iamgages y borrar en cloudinary (falta editar en el futuro partado de edtiar en unidad y alojamiento)
--se orgainzo un poco app.jsx y alojamientos y unidades componetes ahora en carpeta para mas orden y se arreglaron bugs
+.SE QUEITO FORMULARIO MAL DIESÑO, SE CREO UNA ROUTA PARA CREAAR UNIDADES Y ALOJAMNIENTOS
+-sE CORIRGEN MAS BIUGS IMGNEES EN BAKEND 
 
 que falta por hacer
 
-.seguir ordenando para mayor ecalabilidad
+-seguir ordenando para mayor ecalabilidad (PRIORIDAD A PANEL PAGE, DETAIL ALOJAMINTO Y UNIDAD )
+-crear apartado mas bonito E INTUITIVO para crear alojamientos y unidades 
 -seguir solucionando bugs hay muchos
--crear apartado mas bonito para crear alojamientos y unidades 
 -ir subiendo todo a la web (backend y forntend y base de datos)
+
+
+-deadline 26 

@@ -5,59 +5,39 @@ import * as q from './alojamiento.queries.js';
 import * as imagenService from './alojamiento-imagen/alojamiento-imagen.service.js';
 import * as categoriaRelations from '../categorias/categoria.relations.service.js';
 
+// ─── NUEVO: helper que adjunta categorías + imágenes en un solo paso ───────
+const attachRelations = async (alojamiento) => {
+  const conCategorias = await categoriaRelations.attachAlojamientoCategorias(alojamiento);
+  const imagenes = await imagenService.getByAlojamiento(alojamiento.id);
+  return { ...conCategorias, imagenes };
+};
+
 export const create = async (data, user) => {
+  const { titulo, descripcion, ubicacion, latitud, longitud, categorias } = data;
 
-  const {
-    titulo,
-    descripcion,
-    ubicacion,
-    latitud,
-    longitud,
-    categorias
-  } = data;
-
-  await categoriaRelations.validateCategoriasExist(
-    categorias,
-    'alojamiento'
-  );
+  await categoriaRelations.validateCategoriasExist(categorias, 'alojamiento');
 
   const { rows } = await pool.query(
     q.createAlojamiento,
-    [
-      user.id,
-      titulo,
-      descripcion,
-      ubicacion,
-      latitud,
-      longitud,
-      'pendiente_revision'
-    ]
+    [user.id, titulo, descripcion, ubicacion, latitud, longitud, 'pendiente_revision']
   );
 
-  await categoriaRelations.setAlojamientoCategorias(
-    rows[0].id,
-    categorias
-  );
+  await categoriaRelations.setAlojamientoCategorias(rows[0].id, categorias);
 
-  return categoriaRelations.attachAlojamientoCategorias(
-    rows[0]
-  );
+  return attachRelations(rows[0]);   // ← antes: categoriaRelations.attachAlojamientoCategorias(rows[0])
 };
 
 export const getAll = async (user = null) => {
-  // ADMIN
   if (user && user.rol === 'admin') {
     const { rows } = await pool.query(q.getAllAlojamientosAll);
-    return Promise.all(rows.map(categoriaRelations.attachAlojamientoCategorias));
+    return Promise.all(rows.map(attachRelations));   // ← antes: categoriaRelations.attachAlojamientoCategorias
   }
-  // ANFITRION -> solo los suyos
   if (user && user.rol === 'anfitrion') {
-    const { rows } = await pool.query(q.getByAnfitrion, [user.id]); // ← corregido
-    return Promise.all(rows.map(categoriaRelations.attachAlojamientoCategorias));
+    const { rows } = await pool.query(q.getByAnfitrion, [user.id]);
+    return Promise.all(rows.map(attachRelations));
   }
-  // TURISTA / PUBLICO
   const { rows } = await pool.query(q.getAllAlojamientos);
-  return Promise.all(rows.map(categoriaRelations.attachAlojamientoCategorias));
+  return Promise.all(rows.map(attachRelations));
 };
 
 export const getById = async (id, user = null) => {
@@ -66,15 +46,15 @@ export const getById = async (id, user = null) => {
   if (!alojamiento) return null;
 
   if (user && user.rol === 'admin') {
-    return categoriaRelations.attachAlojamientoCategorias(alojamiento);
+    return attachRelations(alojamiento);
   }
 
   if (user && user.rol === 'anfitrion') {
     if (alojamiento.id_anfitrion === user.id) {
-      return categoriaRelations.attachAlojamientoCategorias(alojamiento);
+      return attachRelations(alojamiento);
     }
     if (alojamiento.estado === 'aprobado') {
-      return categoriaRelations.attachAlojamientoCategorias(alojamiento);
+      return attachRelations(alojamiento);
     }
     return null;
   }
@@ -82,7 +62,7 @@ export const getById = async (id, user = null) => {
   if (alojamiento.estado === 'aprobado') {
     const { rows: unidadRows } = await pool.query(q.hasApprovedUnit, [id]);
     if (unidadRows.length > 0) {
-      return categoriaRelations.attachAlojamientoCategorias(alojamiento);
+      return attachRelations(alojamiento);
     }
   }
 
@@ -91,7 +71,7 @@ export const getById = async (id, user = null) => {
 
 export const getMyAlojamientos = async (user) => {
   const { rows } = await pool.query(q.getByAnfitrion, [user.id]);
-  return Promise.all(rows.map(categoriaRelations.attachAlojamientoCategorias));
+  return Promise.all(rows.map(attachRelations));
 };
 
 export const update = async (id, data) => {
@@ -102,19 +82,15 @@ export const update = async (id, data) => {
 
   await categoriaRelations.setAlojamientoCategorias(rows[0].id, categorias);
 
-  return categoriaRelations.attachAlojamientoCategorias(rows[0]);
+  return attachRelations(rows[0]);
 };
 
-
 export const remove = async (id) => {
-  // 1. Borrar todas las imágenes (Cloudinary + BD) reutilizando la lógica existente
   const imagenes = await imagenService.getByAlojamiento(id);
   await Promise.all(imagenes.map((img) => imagenService.remove(img.id)));
 
-  // 2. Borrar relaciones de categorías
   await categoriaRelations.setAlojamientoCategorias(id, []);
 
-  // 3. Borrar el alojamiento
   await pool.query(q.deleteAlojamiento, [id]);
 
   return { message: 'Eliminado correctamente' };

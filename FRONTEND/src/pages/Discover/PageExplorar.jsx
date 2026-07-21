@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AlojamientoCard from "../components/Alojamiento/AlojamientoCard";
-import { Spinner, EmptyState } from "../components/common/ui/index";
-import { BrandIcon } from "../components/common/icons/icons";
-import { useAlojamientosStore } from "../stores/useAlojamientosStore";
+import AlojamientoCard from "../../components/Alojamiento/AlojamientoCard";
+import { Spinner, EmptyState } from "../../components/common/ui/index";
+import { BrandIcon } from "../../components/common/icons/icons";
+import { useAlojamientosStore } from "../../stores/useAlojamientosStore";
 
 const PageExplorar = ({ onRequireAuth }) => {
   const [search, setSearch] = useState("");
@@ -17,11 +17,13 @@ const PageExplorar = ({ onRequireAuth }) => {
     fetchAlojamientos().catch(() => {});
   }, [fetchAlojamientos]);
 
-  const filtered = alojamientos.filter(
-    (a) =>
-      a.titulo?.toLowerCase().includes(search.toLowerCase()) ||
-      a.ubicacion?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = alojamientos
+    .filter((a) => (a.estado || a.estado_publicacion) === "aprobado")
+    .filter(
+      (a) =>
+        a.titulo?.toLowerCase().includes(search.toLowerCase()) ||
+        a.ubicacion?.toLowerCase().includes(search.toLowerCase())
+    );
 
   return (
     <div>
@@ -47,4 +49,4 @@ const PageExplorar = ({ onRequireAuth }) => {
   );
 };
 
-export default PageExplorar;
+export default PageExplorar;  

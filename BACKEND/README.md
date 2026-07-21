@@ -193,13 +193,14 @@ El sistema aún **no incluye**:
 
 ## 🛣️ Mejoras futuras
 
-- [ ] Subida de imágenes (Cloudinary / S3)
+
 - [ ] Validación de inputs con Zod o Joi
 - [ ] Paginación y filtros en listados
 - [ ] Separar entornos de testing y producción
-- [ ] Dockerizar el backend
 - [ ] agregar apartado para favoritos
 - [ ] reseñas tipo foro donde cada usario tenga un perfil y pueda ver e intaracutar con las reseñas de los demas
+- [ ] Añadir docuemntcion swagger
+
 
 ---
 

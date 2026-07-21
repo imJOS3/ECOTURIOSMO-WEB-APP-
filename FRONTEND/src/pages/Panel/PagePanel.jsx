@@ -1,15 +1,16 @@
 import { useState, useCallback, useEffect } from "react";
-import { apiFetch } from "../utils/api";
-import useReservasStore from "../stores/useReservasStore";
-import { useAlojamientosStore } from "../stores/useAlojamientosStore";
-import usePagosStore from "../stores/usePagosStore";
-import useUsuariosStore from "../stores/useUsuariosStore";
-import { useCategoriasStore } from "../stores/useCategoriasStore";
-import { Badge, Spinner, EmptyState } from "../components/common/ui/index";
-import { AlojamientoForm } from "../components/Alojamiento/AlojamientoForm";
-import { TabModeracion, TabModeracionLog } from "../components/panels/TabModeracion";
-import { TabReservasAnfitrion, TabMisUnidades } from "../components/panels/TabAnfitrion";
-import { CalendarIcon, HomeIcon, BedIcon, PaymentIcon, TagIcon, GroupIcon, AdminIcon, ReviewIcon } from "../components/common/icons/icons";
+import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../../utils/api";
+import useReservasStore from "../../stores/useReservasStore";
+import { useAlojamientosStore } from "../../stores/useAlojamientosStore";
+import usePagosStore from "../../stores/usePagosStore";
+import useUsuariosStore from "../../stores/useUsuariosStore";
+import { useCategoriasStore } from "../../stores/useCategoriasStore";
+import { Badge, Spinner, EmptyState } from "../../components/common/ui/index";
+import AlojamientosGrid from "../../components/panels/AlojamientosGrid";
+import { TabModeracion, TabModeracionLog } from "../../components/panels/TabModeracion";
+import { TabReservasAnfitrion, TabMisUnidades } from "../../components/panels/TabAnfitrion";
+import { CalendarIcon, HomeIcon, BedIcon, PaymentIcon, TagIcon, GroupIcon, AdminIcon, ReviewIcon } from "../../components/common/icons/icons";
 
 // ─── Crear Categoría ───────────────────────────────────────────────────────────
 const CrearCategoria = ({ onCreated }) => {
@@ -52,6 +53,7 @@ const CrearCategoria = ({ onCreated }) => {
 
 // ─── PagePanel ─────────────────────────────────────────────────────────────────
 const PagePanel = ({ user }) => {
+  const navigate = useNavigate();
   const [tab, setTab] = useState("reservas");
   const [reservas, setReservas] = useState([]);
   const [alojamientos, setAlojamientos] = useState([]);
@@ -59,7 +61,6 @@ const PagePanel = ({ user }) => {
   const [categorias, setCategorias] = useState([]);
   const [pagos, setPagos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showAlojForm, setShowAlojForm] = useState(false);
   const [msg, setMsg] = useState("");
 
   const loadTab = useCallback(async (t) => {
@@ -167,33 +168,24 @@ const PagePanel = ({ user }) => {
               )
             )}
 
-            {/* ── Alojamientos ── */}
+            {/* ── Alojamientos (cards) ── */}
             {tab === "alojamientos" && (
               <div>
                 {(user.rol === "anfitrion" || user.rol === "admin") && (
-                  <button className="btn btn-primary btn-sm" style={{ marginBottom: "1rem" }} onClick={() => setShowAlojForm(true)}>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    style={{ marginBottom: "1rem" }}
+                    onClick={() => navigate("/panel/alojamientos/nuevo")}
+                  >
                     + Nuevo alojamiento
                   </button>
                 )}
-                {alojamientos.length === 0 ? <EmptyState icon={<HomeIcon fontSize="inherit" />} message="Sin alojamientos" /> : (
-                  <div className="table-wrap">
-                    <table>
-                      <thead><tr><th>Título</th><th>Ubicación</th><th>Estado</th><th>Acción</th></tr></thead>
-                      <tbody>
-                        {alojamientos.map((a) => (
-                          <tr key={a.id}>
-                            <td>{a.titulo}</td>
-                            <td>{a.ubicacion}</td>
-                            <td><Badge status={a.estado || a.estado_publicacion} /></td>
-                            <td>{(user.rol === "anfitrion" || user.rol === "admin") && (
-                              <button className="btn btn-danger btn-sm" onClick={() => deleteAlojamiento(a.id)}>Eliminar</button>
-                            )}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                <AlojamientosGrid
+                  alojamientos={alojamientos}
+                  user={user}
+                  onView={(item) => navigate(`/alojamientos/${item.id}`)}
+                  onDelete={deleteAlojamiento}
+                />
               </div>
             )}
 
@@ -260,13 +252,6 @@ const PagePanel = ({ user }) => {
             )}
           </>
         )
-      )}
-
-      {showAlojForm && (
-        <AlojamientoForm
-          onClose={() => setShowAlojForm(false)}
-          onCreated={() => { setShowAlojForm(false); loadTab("alojamientos"); }}
-        />
       )}
     </div>
   );

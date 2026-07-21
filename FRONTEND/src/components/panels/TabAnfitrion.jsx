@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import useReservasStore from "../../stores/useReservasStore";
 import { useAlojamientosStore } from "../../stores/useAlojamientosStore";
 import { useUnidadesStore } from "../../stores/useUnidadesStore";
 import { Badge, Spinner, EmptyState } from "../common/ui/index";
-import { AlojamientoForm } from "../Alojamiento/AlojamientoForm";
-import { UnidadForm } from "../Unidad/UnidadForm";
 import UnidadCard from "../Unidad/UnidadCard";
 import { imagenesService } from "../../services/imagenes.service";
 import { CalendarIcon, HomeIcon, BedIcon, RefreshIcon, SuccessIcon, ErrorIcon, BackIcon } from "../common/icons/icons";
@@ -117,11 +116,11 @@ export const TabReservasAnfitrion = () => {
 
 // ─── TabMisUnidades ────────────────────────────────────────────────────────────
 export const TabMisUnidades = () => {
+  const navigate = useNavigate();
   const [alojamientos, setAlojamientos] = useState([]);
   const [selectedAloj, setSelectedAloj] = useState(null);
   const [unidades, setUnidades] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
@@ -201,7 +200,12 @@ export const TabMisUnidades = () => {
               <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
                   <h3 className="display" style={{ fontSize: "1.1rem" }}>Unidades — {selectedAloj.titulo}</h3>
-                  <button className="btn btn-primary btn-sm" onClick={() => setShowForm(true)}>+ Nueva unidad</button>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => navigate(`/panel/alojamientos/${selectedAloj.id}/unidades/nueva`)}
+                  >
+                    + Nueva unidad
+                  </button>
                 </div>
                 {unidades.length === 0 ? (
                   <EmptyState icon={<BedIcon fontSize="inherit" />} message="Sin unidades. Agrega una." />
@@ -224,14 +228,6 @@ export const TabMisUnidades = () => {
             )}
           </div>
         </div>
-      )}
-
-      {showForm && selectedAloj && (
-        <UnidadForm
-          alojamientoId={selectedAloj.id}
-          onClose={() => setShowForm(false)}
-          onCreated={() => { setShowForm(false); loadUnidades(selectedAloj); }}
-        />
       )}
     </div>
   );

@@ -3,17 +3,17 @@
 
 import { useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { BackIcon, CalendarIcon } from "../components/common/icons/icons";
-import { useAlojamientosStore } from "../stores/useAlojamientosStore";
+import { BackIcon, CalendarIcon } from "../../components/common/icons/icons";
+import { useAlojamientosStore } from "../../stores/useAlojamientosStore";
 
-import { useInitialAlojamiento } from "../components/Alojamiento/form/useInitialAlojamiento";
-import { useAlojamientoForm } from "../components/Alojamiento/form/useAlojamientoForm";
-import { useImageGallery } from "../components/common/imageGallery/useImageGallery";
-import AlojamientoInfoSection from "../components/Alojamiento/form/AlojamientoInfoSection";
-import AlojamientoLocationSection from "../components/Alojamiento/form/AlojamientoLocationSection";
-import AlojamientoCategoriesSection from "../components/Alojamiento/form/AlojamientoCategoriesSection";
-import ImageGallerySection from "../components/common/imageGallery/ImageGallerySection";
-import AlojamientoPreviewSidebar from "../components/Alojamiento/form/AlojamientoPreviewSidebar";
+import { useInitialAlojamiento } from "../../components/Alojamiento/form/useInitialAlojamiento";
+import { useAlojamientoForm } from "../../components/Alojamiento/form/useAlojamientoForm";
+import { useImageGallery } from "../../components/common/imageGallery/useImageGallery";
+import AlojamientoInfoSection from "../../components/Alojamiento/form/AlojamientoInfoSection";
+import AlojamientoLocationSection from "../../components/Alojamiento/form/AlojamientoLocationSection";
+import AlojamientoCategoriesSection from "../../components/Alojamiento/form/AlojamientoCategoriesSection";
+import ImageGallerySection from "../../components/common/imageGallery/ImageGallerySection";
+import AlojamientoPreviewSidebar from "../../components/Alojamiento/form/AlojamientoPreviewSidebar";
 
 export const PageAlojamientoForm = () => {
   const navigate = useNavigate();

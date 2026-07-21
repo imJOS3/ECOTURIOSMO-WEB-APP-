@@ -2,6 +2,8 @@ import { Badge } from "../common/ui/Badge";
 import { formatCurrency, getEntityCategories, getPrimaryImage } from "../../utils/media";
 
 const UnidadCard = ({ unidad, onClick, selected = false, actions = null }) => {
+  if (!unidad) return null;   // ← guarda de seguridad: si no hay unidad, no renderiza nada
+
   const image = getPrimaryImage(unidad);
   const categories = getEntityCategories(unidad);
 

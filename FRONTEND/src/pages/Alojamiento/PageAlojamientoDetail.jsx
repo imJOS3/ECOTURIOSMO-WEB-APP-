@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { apiFetch } from "../utils/api";
-import AlojamientoDetail from "../components/Alojamiento/AlojamientoDetail";
-import ReserveModal from "../components/Unidad/ReserveModal";
-import { Spinner, EmptyState } from "../components/common/ui/index";
-import { BrandIcon } from "../components/common/icons/icons";
+import { apiFetch } from "../../utils/api";
+import AlojamientoDetail from "../../components/Alojamiento/AlojamientoDetail";
+import ReserveModal from "../../components/Unidad/ReserveModal";
+import { Spinner, EmptyState } from "../../components/common/ui/index";
+import { BrandIcon } from "../../components/common/icons/icons";
 
 const PageAlojamientoDetail = ({ user, onRequireAuth }) => {
   const { id } = useParams();

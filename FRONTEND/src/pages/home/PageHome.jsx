@@ -1,8 +1,8 @@
 // src/pages/PageHome.jsx
 import { useState, useEffect } from "react";
-import { apiFetch } from "../utils/api";
-import AlojamientoCard from "../components/Alojamiento/AlojamientoCard";
-import { HomeIcon, UserIcon, CalendarIcon, MapIcon, BrandIcon } from "../components/common/icons/icons";
+import { apiFetch } from "../../utils/api";
+import AlojamientoCard from "../../components/Alojamiento/AlojamientoCard";
+import { HomeIcon, UserIcon, CalendarIcon, MapIcon, BrandIcon } from "../../components/common/icons/icons";
 
 const PLACEHOLDERS = [
   { id: 1, titulo: "Cabaña del Páramo", ubicacion: "Boyacá, Colombia", descripcion: "Experiencia única a 3.200 m.s.n.m. rodeado de frailejones y niebla perpetua.", estado_publicacion: "aprobado" },
