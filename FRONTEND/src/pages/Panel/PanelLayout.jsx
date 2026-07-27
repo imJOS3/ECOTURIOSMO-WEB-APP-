@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { Badge, Spinner } from "../../components/common/ui/index";
-import { PANEL_TAB_REGISTRY } from "../../routes/panelRoutes";
+import { PANEL_TAB_REGISTRY } from "../../routes/PanelRoutes";
 
 /**
  * PanelLayout
