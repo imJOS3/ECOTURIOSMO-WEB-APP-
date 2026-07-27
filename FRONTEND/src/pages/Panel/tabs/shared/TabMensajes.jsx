@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useOutletContext, useNavigate, useSearchParams } from "react-router-dom";
-import useMensajesStore from "../../../stores/useMensajesStore";
-import { Spinner, EmptyState } from "../../../components/common/ui/index";
-import { ChatIcon, RefreshIcon } from "../../../components/common/icons/icons";
+import useMensajesStore from "../../../../stores/useMensajesStore";
+import { Spinner, EmptyState } from "../../../../components/common/ui/index";
+import { ChatIcon, RefreshIcon } from "../../../../components/common/icons/icons";
 
 const tipoLabel = (tipo) => (tipo === "moderacion" ? "Moderación" : "Consulta");
 
