@@ -23,8 +23,6 @@
     fetchAlojamiento: (id) =>
       apiFetch(`/alojamiento-imagen/alojamiento/${id}`),
 
-    fetchUnidad: (id) =>
-      apiFetch(`/unidad-imagen/unidad/${id}`),
 
     // =========================
     // UPLOAD
@@ -32,15 +30,10 @@
     uploadAlojamiento: (id, files) =>
       uploadImages("/alojamiento-imagen", files, "id_alojamiento", id),
 
-    uploadUnidad: (id, files) =>
-      uploadImages("/unidad-imagen", files, "id_unidad", id),
 
     // =========================
     // DELETE
     // =========================
     deleteAlojamiento: (idAlojamiento, imageId) =>
       apiFetch(`/alojamiento-imagen/${imageId}`, { method: "DELETE" }),
-
-    deleteUnidad: (idUnidad, imageId) =>
-      apiFetch(`/unidad-imagen/${imageId}`, { method: "DELETE" }),
   };

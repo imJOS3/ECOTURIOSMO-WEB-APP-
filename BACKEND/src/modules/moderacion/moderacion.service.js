@@ -4,10 +4,6 @@ const CONFIG = {
   alojamientos: {
     table: 'alojamiento',
     label: 'alojamiento'
-  },
-  unidades: {
-    table: 'unidad',
-    label: 'unidad'
   }
 };
 

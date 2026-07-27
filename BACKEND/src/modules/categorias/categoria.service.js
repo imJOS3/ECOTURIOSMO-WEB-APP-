@@ -5,12 +5,13 @@ export const create = async (data) => {
 
   const {
     nombre,
-    tipo
+    tipo,
+    icono = 'check'
   } = data;
 
   const { rows } = await pool.query(
     q.createCategoria,
-    [nombre, tipo]
+    [nombre, tipo, icono]
   );
 
   return rows[0];
@@ -39,12 +40,13 @@ export const update = async (id, data) => {
 
   const {
     nombre,
-    tipo
+    tipo,
+    icono = 'check'
   } = data;
 
   const { rows } = await pool.query(
     q.updateCategoria,
-    [nombre, tipo, id]
+    [nombre, tipo, icono, id]
   );
 
   return rows[0];

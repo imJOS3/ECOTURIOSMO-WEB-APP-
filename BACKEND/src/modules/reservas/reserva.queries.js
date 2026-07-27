@@ -1,7 +1,7 @@
 export const createReserva = `
 INSERT INTO reserva (
   id_turista,
-  id_unidad,
+  id_alojamiento,
   fecha_inicio,
   fecha_fin,
   total
@@ -16,14 +16,11 @@ RETURNING *;
 export const getReservas = `
 SELECT
   r.*,
-  u.nombre AS nombre_unidad,
   a.titulo AS nombre_alojamiento,
   usr.nombre AS nombre_turista
 FROM reserva r
-INNER JOIN unidad u
-  ON u.id = r.id_unidad
 INNER JOIN alojamiento a
-  ON a.id = u.id_alojamiento
+  ON a.id = r.id_alojamiento
 INNER JOIN usuario usr
   ON usr.id = r.id_turista
 ORDER BY r.created_at DESC;
@@ -35,13 +32,10 @@ ORDER BY r.created_at DESC;
 export const getReservasByUser = `
 SELECT
   r.*,
-  u.nombre AS nombre_unidad,
   a.titulo AS nombre_alojamiento
 FROM reserva r
-INNER JOIN unidad u
-  ON u.id = r.id_unidad
 INNER JOIN alojamiento a
-  ON a.id = u.id_alojamiento
+  ON a.id = r.id_alojamiento
 WHERE r.id_turista = $1
 ORDER BY r.created_at DESC;
 `;
@@ -52,14 +46,11 @@ ORDER BY r.created_at DESC;
 export const getReservasByAnfitrion = `
 SELECT
   r.*,
-  u.nombre AS nombre_unidad,
   a.titulo AS nombre_alojamiento,
   usr.nombre AS nombre_turista
 FROM reserva r
-INNER JOIN unidad u
-  ON u.id = r.id_unidad
 INNER JOIN alojamiento a
-  ON a.id = u.id_alojamiento
+  ON a.id = r.id_alojamiento
 INNER JOIN usuario usr
   ON usr.id = r.id_turista
 WHERE a.id_anfitrion = $1
@@ -83,30 +74,16 @@ DELETE FROM reserva
 WHERE id = $1;
 `;
 
-export const checkAvailability = `
+export const getAlojamientoById = `
 SELECT *
-FROM reserva
-WHERE id_alojamiento = $1
-AND (
-  fecha_inicio < $3
-  AND fecha_fin > $2
-);
-`;
-
-export const getUnidadById = `
-SELECT
-  u.*,
-  a.estado AS alojamiento_estado_publicacion
-FROM unidad u
-INNER JOIN alojamiento a
-  ON a.id = u.id_alojamiento
-WHERE u.id = $1;
+FROM alojamiento
+WHERE id = $1;
 `;
 
 export const checkReservaOverlap = `
 SELECT *
 FROM reserva
-WHERE id_unidad = $1
+WHERE id_alojamiento = $1
 AND estado != 'cancelada'
 AND (
   fecha_inicio <= $3
@@ -117,7 +94,7 @@ AND (
 export const countReservasActivas = `
 SELECT COUNT(*) AS total
 FROM reserva
-WHERE id_unidad = $1
+WHERE id_alojamiento = $1
 AND estado != 'cancelada'
 AND (
   fecha_inicio <= $3

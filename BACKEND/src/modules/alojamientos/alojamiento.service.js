@@ -4,33 +4,72 @@ import pool from '../../config/database.js';
 import * as q from './alojamiento.queries.js';
 import * as imagenService from './alojamiento-imagen/alojamiento-imagen.service.js';
 import * as categoriaRelations from '../categorias/categoria.relations.service.js';
+import * as servicioRelations from '../servicios/servicio.relations.service.js';
 
-// ─── NUEVO: helper que adjunta categorías + imágenes en un solo paso ───────
 const attachRelations = async (alojamiento) => {
   const conCategorias = await categoriaRelations.attachAlojamientoCategorias(alojamiento);
+  const conServicios = await servicioRelations.attachAlojamientoServicios(conCategorias);
   const imagenes = await imagenService.getByAlojamiento(alojamiento.id);
-  return { ...conCategorias, imagenes };
+  return { ...conServicios, imagenes };
+};
+
+const toNumberOrNull = (value) => {
+  if (value === undefined || value === null || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
 };
 
 export const create = async (data, user) => {
-  const { titulo, descripcion, ubicacion, latitud, longitud, categorias } = data;
+  const {
+    titulo,
+    descripcion,
+    ubicacion,
+    latitud,
+    longitud,
+    precio_noche,
+    capacidad,
+    es_compartido = false,
+    cupos_disponibles,
+    habitaciones,
+    camas,
+    banos,
+    categorias,
+    servicios = []
+  } = data;
 
   await categoriaRelations.validateCategoriasExist(categorias, 'alojamiento');
+  await servicioRelations.validateServiciosExist(servicios);
 
   const { rows } = await pool.query(
     q.createAlojamiento,
-    [user.id, titulo, descripcion, ubicacion, latitud, longitud, 'pendiente_revision']
+    [
+      user.id,
+      titulo,
+      descripcion,
+      ubicacion,
+      latitud || null,
+      longitud || null,
+      precio_noche,
+      capacidad,
+      Boolean(es_compartido),
+      toNumberOrNull(cupos_disponibles),
+      toNumberOrNull(habitaciones),
+      toNumberOrNull(camas),
+      toNumberOrNull(banos),
+      'pendiente_revision'
+    ]
   );
 
   await categoriaRelations.setAlojamientoCategorias(rows[0].id, categorias);
+  await servicioRelations.setAlojamientoServicios(rows[0].id, servicios);
 
-  return attachRelations(rows[0]);   // ← antes: categoriaRelations.attachAlojamientoCategorias(rows[0])
+  return attachRelations(rows[0]);
 };
 
 export const getAll = async (user = null) => {
   if (user && user.rol === 'admin') {
     const { rows } = await pool.query(q.getAllAlojamientosAll);
-    return Promise.all(rows.map(attachRelations));   // ← antes: categoriaRelations.attachAlojamientoCategorias
+    return Promise.all(rows.map(attachRelations));
   }
   if (user && user.rol === 'anfitrion') {
     const { rows } = await pool.query(q.getByAnfitrion, [user.id]);
@@ -60,10 +99,7 @@ export const getById = async (id, user = null) => {
   }
 
   if (alojamiento.estado === 'aprobado') {
-    const { rows: unidadRows } = await pool.query(q.hasApprovedUnit, [id]);
-    if (unidadRows.length > 0) {
-      return attachRelations(alojamiento);
-    }
+    return attachRelations(alojamiento);
   }
 
   return null;
@@ -75,12 +111,44 @@ export const getMyAlojamientos = async (user) => {
 };
 
 export const update = async (id, data) => {
-  const { titulo, descripcion, ubicacion, latitud, longitud, categorias } = data;
+  const {
+    titulo,
+    descripcion,
+    ubicacion,
+    latitud,
+    longitud,
+    precio_noche,
+    capacidad,
+    es_compartido = false,
+    cupos_disponibles,
+    habitaciones,
+    camas,
+    banos,
+    categorias,
+    servicios = []
+  } = data;
+
+  await categoriaRelations.validateCategoriasExist(categorias, 'alojamiento');
+  await servicioRelations.validateServiciosExist(servicios);
+
   const { rows } = await pool.query(q.updateAlojamiento, [
-    titulo, descripcion, ubicacion, latitud, longitud, id
+    titulo,
+    descripcion,
+    ubicacion,
+    latitud || null,
+    longitud || null,
+    precio_noche,
+    capacidad,
+    Boolean(es_compartido),
+    toNumberOrNull(cupos_disponibles),
+    toNumberOrNull(habitaciones),
+    toNumberOrNull(camas),
+    toNumberOrNull(banos),
+    id
   ]);
 
   await categoriaRelations.setAlojamientoCategorias(rows[0].id, categorias);
+  await servicioRelations.setAlojamientoServicios(rows[0].id, servicios);
 
   return attachRelations(rows[0]);
 };

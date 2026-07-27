@@ -1,13 +1,13 @@
-que se realizo hoy
-.SE QUEITO FORMULARIO MAL DIESÑO, SE CREO UNA ROUTA PARA CREAAR UNIDADES Y ALOJAMNIENTOS
--sE CORIRGEN MAS BIUGS IMGNEES EN BAKEND 
+# Frontend — EcoTurismo
 
-que falta por hacer
+SPA en React + Vite.
 
--seguir ordenando para mayor ecalabilidad (PRIORIDAD A PANEL PAGE, DETAIL ALOJAMINTO Y UNIDAD )
--crear apartado mas bonito E INTUITIVO para crear alojamientos y unidades 
--seguir solucionando bugs hay muchos
--ir subiendo todo a la web (backend y forntend y base de datos)
+## Arranque local
 
+```bash
+cp .env.example .env
+npm install
+npm run dev
+```
 
--deadline 26 
+Documentación completa del monorepo: [SETUP_LOCAL.md](../SETUP_LOCAL.md)

@@ -1,0 +1,683 @@
+
+.aloj-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+
+.aloj-detail-title {
+  font-size: 1.9rem;
+  margin: 0 0 6px;
+  line-height: 1.15;
+}
+
+.aloj-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.aloj-detail-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-color, inherit);
+  font-weight: 600;
+}
+
+.aloj-detail-substats {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 2px 0 6px;
+}
+
+/* ── Bloque de rating destacado ── */
+.highlight-strip {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius, 14px);
+  padding: 18px 20px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.highlight-strip-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex: 1;
+  min-width: 90px;
+}
+
+.highlight-strip-item + .highlight-strip-item {
+  border-left: 1px solid var(--border);
+  padding-left: 20px;
+}
+
+.highlight-strip-favorito {
+  color: var(--green);
+}
+
+.highlight-strip-text {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  flex: 2;
+  min-width: 160px;
+}
+
+.highlight-strip-rating-num {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* ── Botón "Mostrar más / menos" ── */
+.description-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-color, inherit);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.description-toggle-btn:hover {
+  color: var(--green);
+}
+
+/* ── Conoce al anfitrión ── */
+.host-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 0.5px solid var(--border);
+}
+
+.host-section-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 2.5rem;
+}
+
+.host-profile-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 14px);
+  padding: 22px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  margin-bottom: 1.25rem;
+}
+
+.host-profile-avatar-wrap {
+  position: relative;
+  width: fit-content;
+  margin-bottom: 10px;
+}
+
+.host-profile-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 1.4rem;
+}
+
+.host-verified-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--card-bg);
+  border-radius: 50%;
+  display: flex;
+  color: var(--green);
+  box-shadow: 0 0 0 2px var(--card-bg);
+}
+
+.host-profile-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.host-profile-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+
+.host-stats-row {
+  display: flex;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  gap: 14px;
+}
+
+.host-stat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.host-stat-num {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.host-stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.host-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-color, inherit);
+  margin-bottom: 10px;
+}
+
+.host-safety-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 0.5px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.host-safety-note svg {
+  flex-shrink: 0;
+  color: var(--green);
+  margin-top: 1px;
+}
+
+/* ── Lo que debes saber ── */
+.know-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 0.5px solid var(--border);
+}
+
+.know-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.75rem;
+}
+
+.know-item svg {
+  color: var(--text-color, inherit);
+  margin-bottom: 10px;
+}
+
+.know-item-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin: 0 0 6px;
+}
+
+.know-item-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.know-item-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 800px) {
+  .host-section-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* ── Botones de acción (Compartir / Guardar) ── */
+.icon-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 6px 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-color, inherit);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.icon-action-btn:hover {
+  color: var(--green);
+}
+
+.icon-action-btn-active {
+  color: var(--green);
+}
+
+/* ── Sub-nav de secciones (jump links) ── */
+.section-subnav {
+  display: flex;
+  gap: 22px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  overflow-x: auto;
+}
+
+.section-subnav-item {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 2px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.section-subnav-item:hover {
+  color: var(--green);
+  border-bottom-color: var(--green);
+}
+
+/* ── Link "Cómo llegar" ── */
+.directions-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--green);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* ── Galería tipo grid Airbnb ── */
+.aloj-gallery-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 6px;
+  height: 380px;
+  border-radius: var(--radius, 14px);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.aloj-gallery-main {
+  grid-row: 1 / 3;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  background-color: var(--surface);
+}
+
+.aloj-gallery-thumb {
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  background-color: var(--surface);
+}
+
+.aloj-gallery-main,
+.aloj-gallery-thumb {
+  position: relative;
+  transition: filter 0.15s ease;
+}
+
+.aloj-gallery-main:hover,
+.aloj-gallery-thumb:hover {
+  filter: brightness(0.92);
+}
+
+.aloj-gallery-fallback {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.aloj-gallery-more-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: #fff;
+  color: #111;
+  border: 1px solid #111;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.aloj-gallery-single {
+  height: 380px;
+  border-radius: var(--radius, 14px);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface);
+}
+
+/* ── Experiencia (categorías) ── */
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin: 1.5rem 0 2rem;
+}
+
+.amenity-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--card-bg);
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.amenity-item svg {
+  flex-shrink: 0;
+  color: var(--green);
+}
+
+/* ── Servicios (estilo listado Airbnb) ── */
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+  margin: 0 0 1.5rem;
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.98rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.service-item svg {
+  flex-shrink: 0;
+  color: var(--text);
+}
+
+.services-show-all {
+  margin-top: 0.25rem;
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: 1px solid var(--text);
+  background: transparent;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Reseñas ── */
+.review-card {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius, 14px);
+  background: var(--card-bg);
+}
+
+.review-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--green-light);
+  color: var(--green);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+
+/* ── Fix del sticky sidebar ──
+   Bug: si .detail-layout (grid de 2 columnas, definido en tu CSS global)
+   no tiene align-items:start, el navegador calcula mal hasta dónde puede
+   "viajar" el sticky y se queda pegado a medio scroll sin bajar más.
+   Esta regla vive acá (no en tu CSS global) para no tocar ese archivo;
+   como se importa a nivel de componente, gana en la cascada. */
+.detail-layout {
+  align-items: start;
+}
+
+/* ── Sidebar sticky de reserva (estilo Airbnb) ── */
+.detail-sidebar {
+  position: sticky;
+  top: 5rem;
+  /* si tu Navbar es fixed/sticky y tapa el borde superior de la card,
+     sube este valor (ej: 88px) para que no quede debajo de la barra */
+}
+
+/* ── Sidebar sticky de reserva (estilo Airbnb) ── */
+.aloj-sidebar-sticky {
+  position: sticky;
+  top: 1.5rem;
+  /* si tu Navbar es fixed/sticky y tapa el borde superior de la card,
+     sube este valor (ej: 88px) para que no quede debajo de la barra */
+}
+
+.aloj-price-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 14px);
+  padding: 20px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+  background: var(--card-bg);
+}
+
+.aloj-price-card-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.aloj-price-card-amount span {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* ── Mapa de ubicación ── */
+.map-embed-wrap {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border-radius: var(--radius, 14px);
+  overflow: hidden;
+  border: 0.5px solid var(--border);
+}
+
+/* position:absolute + inset:0 en vez de solo width/height:100% inline:
+   así el iframe siempre llena el wrapper sin depender de su tamaño
+   intrínseco por defecto (300x150), que en algunos navegadores "gana"
+   por encima de un width:100% puesto solo inline. */
+.map-embed-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.approx-map-marker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  pointer-events: none;
+}
+
+.map-expand-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+.map-expand-btn:hover {
+  background: #f4f4f4;
+}
+
+.map-privacy-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+/* ── Alojamientos similares ── */
+.similar-listings-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 0.5px solid var(--border);
+}
+
+.similar-listings-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+.similar-card-wrap {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+}
+
+.similar-listings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.similar-listings-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.similar-listings-page {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.similar-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-color, inherit);
+}
+
+.similar-nav-btn:hover:not(:disabled) {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.similar-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ── Barra de reserva fija (solo móvil) ── */
+.mobile-book-bar {
+  display: none;
+}
+
+@media (max-width: 800px) {
+  .mobile-book-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+  }
+
+  /* evita que la barra fija tape contenido al final de la página */
+  .detail-layout {
+    padding-bottom: 70px;
+  }
+
+  /* la barra fija reemplaza al CTA del sidebar en móvil, sin duplicar */
+  .aloj-sidebar-sticky .aloj-price-card {
+    display: none;
+  }
+}

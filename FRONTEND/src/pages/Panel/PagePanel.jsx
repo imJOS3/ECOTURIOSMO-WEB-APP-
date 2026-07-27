@@ -9,7 +9,7 @@ import { useCategoriasStore } from "../../stores/useCategoriasStore";
 import { Badge, Spinner, EmptyState } from "../../components/common/ui/index";
 import AlojamientosGrid from "../../components/panels/AlojamientosGrid";
 import { TabModeracion, TabModeracionLog } from "../../components/panels/TabModeracion";
-import { TabReservasAnfitrion, TabMisUnidades } from "../../components/panels/TabAnfitrion";
+import { TabReservasAnfitrion } from "../../components/panels/TabAnfitrion";
 import { CalendarIcon, HomeIcon, BedIcon, PaymentIcon, TagIcon, GroupIcon, AdminIcon, ReviewIcon } from "../../components/common/icons/icons";
 
 // ─── Crear Categoría ───────────────────────────────────────────────────────────
@@ -42,7 +42,6 @@ const CrearCategoria = ({ onCreated }) => {
         <label className="form-label">Tipo</label>
         <select className="form-input form-select" value={tipo} onChange={(e) => setTipo(e.target.value)}>
           <option value="alojamiento">Alojamiento</option>
-          <option value="unidad">Unidad</option>
         </select>
       </div>
       <button className="btn btn-primary btn-sm" onClick={submit} style={{ height: 42 }}>Agregar</button>
@@ -89,14 +88,13 @@ const PagePanel = ({ user }) => {
     catch (e) { setMsg(e.message); }
   };
 
-  const SPECIAL_TABS = ["moderacion", "moderacion_unidades", "moderacion_log", "unidades", "reservas_recibidas"];
+  const SPECIAL_TABS = ["moderacion", "moderacion_log", "reservas_recibidas"];
 
   const tabs = [
     { id: "reservas", label: "Mis Reservas", icon: CalendarIcon },
     ...(user.rol === "anfitrion" ? [
       { id: "reservas_recibidas", label: "Reservas recibidas", icon: CalendarIcon },
       { id: "alojamientos", label: "Alojamientos", icon: HomeIcon },
-      { id: "unidades", label: "Unidades", icon: BedIcon },
     ] : []),
     { id: "pagos", label: "Pagos", icon: PaymentIcon },
     ...(user.rol === "admin" ? [
@@ -106,7 +104,6 @@ const PagePanel = ({ user }) => {
       { id: "alojamientos", label: "Alojamientos", icon: HomeIcon },
       { id: "usuarios", label: "Usuarios", icon: GroupIcon },
       { id: "moderacion", label: "Mod. Alojamientos", icon: AdminIcon },
-      { id: "moderacion_unidades", label: "Mod. Unidades", icon: BedIcon },
       { id: "moderacion_log", label: "Log moderación", icon: ReviewIcon },
     ] : []),
   ];
@@ -135,10 +132,10 @@ const PagePanel = ({ user }) => {
 
       {/* Special tabs (self-loading) */}
       {tab === "moderacion"         && <TabModeracion tipoInicial="alojamientos" />}
-      {tab === "moderacion_unidades"&& <TabModeracion tipoInicial="unidades" />}
+
       {tab === "moderacion_log"     && <TabModeracionLog />}
       {tab === "reservas_recibidas" && <TabReservasAnfitrion />}
-      {tab === "unidades"           && <TabMisUnidades />}
+
 
       {/* Data tabs */}
       {!SPECIAL_TABS.includes(tab) && (
@@ -149,12 +146,10 @@ const PagePanel = ({ user }) => {
               reservas.length === 0 ? <EmptyState icon={<CalendarIcon fontSize="inherit" />} message="Sin reservas aún" /> : (
                 <div className="table-wrap">
                   <table>
-                    <thead><tr><th>ID</th><th>Unidad</th><th>Entrada</th><th>Salida</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
                     <tbody>
                       {reservas.map((r) => (
                         <tr key={r.id}>
                           <td>#{r.id}</td>
-                          <td>{r.nombre_unidad}</td>
                           <td>{new Date(r.fecha_inicio).toLocaleDateString("es-CO")}</td>
                           <td>{new Date(r.fecha_fin).toLocaleDateString("es-CO")}</td>
                           <td>${parseFloat(r.total || 0).toFixed(0)}</td>
@@ -218,7 +213,7 @@ const PagePanel = ({ user }) => {
                 {categorias.length === 0 ? <EmptyState icon={<TagIcon fontSize="inherit" />} message="Sin categorías" /> : (
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {categorias.map((c) => (
-                      <span key={c.id} className={`badge ${c.tipo === "unidad" ? "badge-teal" : "badge-green"}`} style={{ padding: "6px 14px", fontSize: "0.875rem" }}>{c.nombre} · {c.tipo}</span>
+                      <span key={c.id} className="badge badge-green" style={{ padding: "6px 14px", fontSize: "0.875rem" }}>{c.nombre}</span>
                     ))}
                   </div>
                 )}

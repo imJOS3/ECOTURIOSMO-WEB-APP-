@@ -18,8 +18,11 @@ const createUsuario = async ({ rol = 'turista' } = {}) => {
 
 const createAlojamiento = async (idAnfitrion) => {
   const { rows } = await pool.query(
-    `INSERT INTO alojamiento (id_anfitrion, titulo, descripcion, ubicacion, latitud, longitud)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO alojamiento (
+       id_anfitrion, titulo, descripcion, ubicacion, latitud, longitud,
+       precio_noche, capacidad, es_compartido, estado
+     )
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'aprobado')
      RETURNING *`,
     [
       idAnfitrion,
@@ -27,7 +30,10 @@ const createAlojamiento = async (idAnfitrion) => {
       'Descripcion de prueba para alojamiento',
       'Medellin',
       6.2442,
-      -75.5812
+      -75.5812,
+      100,
+      2,
+      false
     ]
   );
 
@@ -73,8 +79,11 @@ describe('Database CRUD', () => {
     const anfitrion = await createUsuario({ rol: 'anfitrion' });
 
     const create = await pool.query(
-      `INSERT INTO alojamiento (id_anfitrion, titulo, descripcion, ubicacion, latitud, longitud)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO alojamiento (
+         id_anfitrion, titulo, descripcion, ubicacion, latitud, longitud,
+         precio_noche, capacidad, es_compartido, estado
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pendiente_revision')
        RETURNING *`,
       [
         anfitrion.id,
@@ -82,59 +91,32 @@ describe('Database CRUD', () => {
         'Descripcion larga para crear alojamiento',
         'Guatape',
         6.2308,
-        -75.1586
+        -75.1586,
+        120,
+        4,
+        false
       ]
     );
 
     const alojamiento = create.rows[0];
     expect(alojamiento.id_anfitrion).toBe(anfitrion.id);
+    expect(Number(alojamiento.precio_noche)).toBe(120);
 
     const read = await pool.query('SELECT * FROM alojamiento WHERE id = $1', [alojamiento.id]);
     expect(read.rows[0].id).toBe(alojamiento.id);
 
     const update = await pool.query(
       `UPDATE alojamiento
-       SET titulo = $1, estado_publicacion = $2
-       WHERE id = $3
+       SET titulo = $1, estado = $2, precio_noche = $3
+       WHERE id = $4
        RETURNING *`,
-      [uniqueText('eco_house_updated'), 'rechazado', alojamiento.id]
+      [uniqueText('eco_house_updated'), 'rechazado', 150, alojamiento.id]
     );
-    expect(update.rows[0].estado_publicacion).toBe('rechazado');
+    expect(update.rows[0].estado).toBe('rechazado');
+    expect(Number(update.rows[0].precio_noche)).toBe(150);
 
     await pool.query('DELETE FROM alojamiento WHERE id = $1', [alojamiento.id]);
     const afterDelete = await pool.query('SELECT id FROM alojamiento WHERE id = $1', [alojamiento.id]);
-    expect(afterDelete.rows).toHaveLength(0);
-  });
-
-  it('CRUD unidad', async () => {
-    const anfitrion = await createUsuario({ rol: 'anfitrion' });
-    const alojamiento = await createAlojamiento(anfitrion.id);
-
-    const create = await pool.query(
-      `INSERT INTO unidad (id_alojamiento, nombre, tipo, descripcion, capacidad, precio_noche, cupos_disponibles, es_compartido)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-      [alojamiento.id, uniqueText('unidad'), 'habitacion', 'Unidad de prueba', 2, 120.0, 2, false]
-    );
-
-    const unidad = create.rows[0];
-    expect(unidad.id_alojamiento).toBe(alojamiento.id);
-
-    const read = await pool.query('SELECT * FROM unidad WHERE id = $1', [unidad.id]);
-    expect(read.rows[0].nombre).toBe(unidad.nombre);
-
-    const update = await pool.query(
-      `UPDATE unidad
-       SET precio_noche = $1, cupos_disponibles = $2
-       WHERE id = $3
-       RETURNING *`,
-      [150.0, 1, unidad.id]
-    );
-    expect(Number(update.rows[0].precio_noche)).toBe(150);
-    expect(update.rows[0].cupos_disponibles).toBe(1);
-
-    await pool.query('DELETE FROM unidad WHERE id = $1', [unidad.id]);
-    const afterDelete = await pool.query('SELECT id FROM unidad WHERE id = $1', [unidad.id]);
     expect(afterDelete.rows).toHaveLength(0);
   });
 
@@ -143,23 +125,16 @@ describe('Database CRUD', () => {
     const anfitrion = await createUsuario({ rol: 'anfitrion' });
     const alojamiento = await createAlojamiento(anfitrion.id);
 
-    const unidadResult = await pool.query(
-      `INSERT INTO unidad (id_alojamiento, nombre, tipo, descripcion, capacidad, precio_noche, cupos_disponibles, es_compartido)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-      [alojamiento.id, uniqueText('unidad_reserva'), 'habitacion', 'Unidad para reserva', 2, 100.0, 2, false]
-    );
-    const unidad = unidadResult.rows[0];
-
     const create = await pool.query(
-      `INSERT INTO reserva (id_turista, id_unidad, fecha_inicio, fecha_fin, estado, total)
+      `INSERT INTO reserva (id_turista, id_alojamiento, fecha_inicio, fecha_fin, estado, total)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [turista.id, unidad.id, '2026-06-01', '2026-06-03', 'pendiente', 200.0]
+      [turista.id, alojamiento.id, '2026-06-01', '2026-06-03', 'pendiente', 200.0]
     );
 
     const reserva = create.rows[0];
     expect(reserva.id_turista).toBe(turista.id);
+    expect(reserva.id_alojamiento).toBe(alojamiento.id);
 
     const read = await pool.query('SELECT * FROM reserva WHERE id = $1', [reserva.id]);
     expect(read.rows[0].estado).toBe('pendiente');
@@ -184,18 +159,11 @@ describe('Database CRUD', () => {
     const anfitrion = await createUsuario({ rol: 'anfitrion' });
     const alojamiento = await createAlojamiento(anfitrion.id);
 
-    const unidadResult = await pool.query(
-      `INSERT INTO unidad (id_alojamiento, nombre, tipo, descripcion, capacidad, precio_noche, cupos_disponibles, es_compartido)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-      [alojamiento.id, uniqueText('unidad_pago'), 'habitacion', 'Unidad para pago', 2, 100.0, 2, false]
-    );
-
     const reservaResult = await pool.query(
-      `INSERT INTO reserva (id_turista, id_unidad, fecha_inicio, fecha_fin, estado, total)
+      `INSERT INTO reserva (id_turista, id_alojamiento, fecha_inicio, fecha_fin, estado, total)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [turista.id, unidadResult.rows[0].id, '2026-07-01', '2026-07-03', 'pendiente', 200.0]
+      [turista.id, alojamiento.id, '2026-07-01', '2026-07-03', 'pendiente', 200.0]
     );
 
     const create = await pool.query(

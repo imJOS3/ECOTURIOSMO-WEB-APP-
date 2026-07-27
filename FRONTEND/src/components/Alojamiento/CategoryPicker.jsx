@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useCategoriasStore } from "../../stores/useCategoriasStore";
+import { AmenityIcon } from "./amenityIcons";
 
 const CategoryPicker = ({
   tipo,
@@ -49,6 +50,7 @@ const CategoryPicker = ({
                 onClick={() => toggle(categoria.id)}
                 disabled={disabled}
               >
+                <AmenityIcon icono={categoria.icono} nombre={categoria.nombre} size={16} />
                 <span>{categoria.nombre}</span>
                 {active && <span className="chip-dot">✓</span>}
               </button>

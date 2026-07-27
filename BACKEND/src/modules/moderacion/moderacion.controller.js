@@ -20,9 +20,6 @@ export const aprobarAlojamiento = runModeration('alojamientos', 'aprobar');
 export const rechazarAlojamiento = runModeration('alojamientos', 'rechazar');
 export const suspenderAlojamiento = runModeration('alojamientos', 'suspender');
 
-export const aprobarUnidad = runModeration('unidades', 'aprobar');
-export const rechazarUnidad = runModeration('unidades', 'rechazar');
-export const suspenderUnidad = runModeration('unidades', 'suspender');
 export const getModeracionLog = async (req, res, next) => {
   try {
     const logs = await getLogs();

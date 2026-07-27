@@ -1,7 +1,6 @@
 const IMAGE_KEYS = [
   "imagenes",
   "imagenes_alojamiento",
-  "imagenes_unidad",
   "images",
   "media",
   "galeria",

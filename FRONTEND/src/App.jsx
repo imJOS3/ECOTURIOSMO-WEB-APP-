@@ -1,18 +1,22 @@
-
 import { useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { getUser } from "./utils/api";
 import { useTheme } from "./hooks/useTheme";
 import Navbar from "./components/layout/Navbar";
 import AuthModal from "./components/auth/AuthModal";
+import MessagesDrawer from "./components/chat/MessagesDrawer";
+import useMensajesStore from "./stores/useMensajesStore";
 import PageHome from "./pages/home/PageHome";
 import PageExplorar from "./pages/Discover/PageExplorar";
-import PagePanel from "./pages/Panel/PagePanel";
+import PanelLayout from "./pages/Panel/PanelLayout";
+import { buildPanelChildRoutes } from "./routes/PanelRoutes";
 import { BrandIcon, LockIcon } from "./components/common/icons/icons";
 import PageAlojamientoDetail from "./pages/Alojamiento/PageAlojamientoDetail";
-import PageUnidadDetail from "./pages/Unidad/PageUnidadDetail";
 import AlojamientoFormPage from "./pages/Alojamiento/AlojamientoFormPage";
-import PageUnidadForm from "./pages/Unidad/PageUnidadForm";
+import PagePerfil from "./pages/cuenta/PagePerfil";
+import PageSoporte from "./pages/cuenta/PageSoporte";
+import useAuthStore from "./stores/useAuthStore";
+
 import "./styles/global.css";
 
 
@@ -24,21 +28,35 @@ export default function App() {
   const [user, setUser]       = useState(getUser);
   const [authMode, setAuthMode] = useState(null);
   const { dark, toggle }       = useTheme();
+  const logoutStore = useAuthStore((s) => s.logout);
+
+  const drawerOpen = useMensajesStore((s) => s.drawerOpen);
+  const setDrawerOpen = useMensajesStore((s) => s.setDrawerOpen);
+  const resetMensajes = useMensajesStore((s) => s.reset);
 
   const currentPage = location.pathname.startsWith("/panel")
     ? "panel"
     : location.pathname.startsWith("/explorar")
       ? "explorar"
-      : "home";
+      : location.pathname.startsWith("/cuenta/perfil")
+        ? "perfil"
+        : location.pathname.startsWith("/cuenta/soporte")
+          ? "soporte"
+          : "home";
 
   const goToPage = (nextPage) => {
     setPage(nextPage);
-    navigate(nextPage === "home" ? "/" : `/${nextPage}`);
+    if (nextPage === "home") navigate("/");
+    else if (nextPage === "perfil") navigate("/cuenta/perfil");
+    else if (nextPage === "soporte") navigate("/cuenta/soporte");
+    else navigate(`/${nextPage}`);
   };
 
   const logout = () => {
     localStorage.removeItem("eco_token");
     localStorage.removeItem("eco_user");
+    logoutStore();
+    resetMensajes();
     setUser(null);
     goToPage("home");
   };
@@ -77,15 +95,16 @@ export default function App() {
               </div>
             )}
           />
+
           <Route path="/panel/alojamientos/nuevo" element={<AlojamientoFormPage />} />
-          <Route path="/panel/alojamientos/:id/editar" element={<AlojamientoFormPage />} />   
-          <Route path="/panel/alojamientos/:alojamientoId/unidades/nueva" element={<PageUnidadForm />} />
-          <Route path="/panel/alojamientos/:alojamientoId/unidades/:id/editar" element={<PageUnidadForm />} />
+          <Route path="/panel/alojamientos/:id/editar" element={<AlojamientoFormPage />} />
+
+          {/* ── Panel: layout + tabs como rutas hijas (lazy, cada una su chunk) ── */}
           <Route
             path="/panel"
             element={user ? (
               <div className="main">
-                <PagePanel user={user} />
+                <PanelLayout user={user} />
               </div>
             ) : (
               <div className="main">
@@ -98,7 +117,10 @@ export default function App() {
                 </div>
               </div>
             )}
-          />
+          >
+            {user && buildPanelChildRoutes(user)}
+          </Route>
+
           <Route
             path="/alojamientos/:id"
             element={(
@@ -107,14 +129,28 @@ export default function App() {
               </div>
             )}
           />
+
           <Route
-            path="/alojamientos/:id/unidades/:unidadId"
+            path="/cuenta/perfil"
             element={(
               <div className="main">
-                <PageUnidadDetail user={user} onRequireAuth={onRequireAuth} />
+                <PagePerfil
+                  user={user}
+                  onUserUpdated={setUser}
+                  onRequireAuth={onRequireAuth}
+                />
               </div>
             )}
           />
+          <Route
+            path="/cuenta/soporte"
+            element={(
+              <div className="main">
+                <PageSoporte user={user} onRequireAuth={onRequireAuth} />
+              </div>
+            )}
+          />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 
@@ -122,6 +158,14 @@ export default function App() {
           <strong style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><BrandIcon fontSize="small" /> EcoTurismo</strong> — Plataforma de turismo sostenible · {new Date().getFullYear()}
         </footer>
       </div>
+
+      {user && (
+        <MessagesDrawer
+          user={user}
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+        />
+      )}
 
       {authMode && (
         <AuthModal mode={authMode} onClose={() => setAuthMode(null)} onAuth={onAuth} />

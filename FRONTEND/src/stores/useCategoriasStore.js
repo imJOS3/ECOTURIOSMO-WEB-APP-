@@ -6,7 +6,6 @@ const initialBucket = () => ({ items: [], loading: false, error: null, loaded: f
 export const useCategoriasStore = create((set, get) => ({
   porTipo: {
     alojamiento: initialBucket(),
-    unidad: initialBucket(),
     todas: initialBucket(),
   },
   fetchCategorias: async (tipo = "todas", force = false) => {

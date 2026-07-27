@@ -9,10 +9,6 @@ router.post('/alojamientos/:id/aprobar', auth, checkRole('admin'), ctrl.aprobarA
 router.post('/alojamientos/:id/rechazar', auth, checkRole('admin'), ctrl.rechazarAlojamiento);
 router.post('/alojamientos/:id/suspender', auth, checkRole('admin'), ctrl.suspenderAlojamiento);
 
-router.post('/unidades/:id/aprobar', auth, checkRole('admin'), ctrl.aprobarUnidad);
-router.post('/unidades/:id/rechazar', auth, checkRole('admin'), ctrl.rechazarUnidad);
-router.post('/unidades/:id/suspender', auth, checkRole('admin'), ctrl.suspenderUnidad);
-
 router.get('/log', auth, checkRole('admin'), ctrl.getModeracionLog);
 
 export default router;

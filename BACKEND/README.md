@@ -68,6 +68,17 @@ Authorization: Bearer <TOKEN>
 
 Base URL: `http://localhost:3000/api`
 
+### 📘 Documentación Swagger
+
+Con el servidor en marcha abre:
+
+- **UI interactiva:** [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+- **Spec OpenAPI JSON:** [http://localhost:3000/api/docs.json](http://localhost:3000/api/docs.json)
+
+En Swagger: **Authorize** → pega el JWT del login (`Bearer` se añade solo).
+
+---
+
 **Auth**
 - POST `/api/auth/register` — Registrar usuario (body: `nombre`, `email`, `password`, `rol` opcional).
 - POST `/api/auth/login` — Autenticar y recibir `{ user, token }`.
@@ -82,21 +93,13 @@ Base URL: `http://localhost:3000/api`
 **Alojamientos** (`/api/alojamientos`)
 - GET `/api/alojamientos/` — (Público / auth opcional) Listar alojamientos visibles según rol.
 - GET `/api/alojamientos/:id` — (Auth opcional) Ver alojamiento por id (control de acceso aplica).
-- POST `/api/alojamientos/` — (Auth + `anfitrion`) Crear alojamiento (validación de esquema aplicada).
+- POST `/api/alojamientos/` — (Auth + `anfitrion`) Crear alojamiento (incluye `precio_noche`, `capacidad`, categorías).
 - GET `/api/alojamientos/mine` — (Auth + `anfitrion`) Listar alojamientos del anfitrión autenticado.
 - PUT `/api/alojamientos/:id` — (Auth + `anfitrion`) Actualizar alojamiento.
 - DELETE `/api/alojamientos/:id` — (Auth + `anfitrion`) Eliminar alojamiento.
 
-**Unidades** (`/api/unidades`)
-- POST `/api/unidades/` — (Auth + `anfitrion`) Crear unidad.
-- GET `/api/unidades/alojamiento/:id` — (Público / auth opcional) Listar unidades de un alojamiento.
-- GET `/api/unidades/:id` — (Auth opcional) Obtener unidad por id.
-- GET `/api/unidades/mine` — (Auth + `anfitrion`) Listar unidades del anfitrión.
-- PUT `/api/unidades/:id` — (Auth + `anfitrion`) Actualizar unidad.
-- DELETE `/api/unidades/:id` — (Auth + `anfitrion`) Eliminar unidad.
-
 **Reservas** (`/api/reservas`)
-- POST `/api/reservas/` — (Auth) Crear reserva.
+- POST `/api/reservas/` — (Auth) Crear reserva con `id_alojamiento`, `fecha_inicio`, `fecha_fin`.
 - GET `/api/reservas/` — (Auth) Listar reservas (según permisos).
 - GET `/api/reservas/mine` — (Auth) Listar reservas del usuario autenticado.
 - PUT `/api/reservas/:id` — (Auth) Actualizar reserva.
@@ -113,16 +116,13 @@ Base URL: `http://localhost:3000/api`
 - GET `/api/resenas/alojamiento/:id` — Obtener reseñas de un alojamiento.
 
 **Categorías** (`/api/categorias`)
-- POST `/api/categorias/` — (Auth + `admin`) Crear categoría.
+- POST `/api/categorias/` — (Auth + `admin`) Crear categoría (`tipo: alojamiento`).
 - GET `/api/categorias/` — Obtener todas las categorías.
 
 **Moderación (admin)** (`/api/admin/moderacion`)
 - POST `/api/admin/moderacion/alojamientos/:id/aprobar` — (Auth + `admin`) Aprobar alojamiento.
 - POST `/api/admin/moderacion/alojamientos/:id/rechazar` — (Auth + `admin`) Rechazar alojamiento.
 - POST `/api/admin/moderacion/alojamientos/:id/suspender` — (Auth + `admin`) Suspender alojamiento.
-- POST `/api/admin/moderacion/unidades/:id/aprobar` — (Auth + `admin`) Aprobar unidad.
-- POST `/api/admin/moderacion/unidades/:id/rechazar` — (Auth + `admin`) Rechazar unidad.
-- POST `/api/admin/moderacion/unidades/:id/suspender` — (Auth + `admin`) Suspender unidad.
 
 Notas:
 - Para endpoints protegidos añade header: `Authorization: Bearer <token>`.
@@ -199,7 +199,7 @@ El sistema aún **no incluye**:
 - [ ] Separar entornos de testing y producción
 - [ ] agregar apartado para favoritos
 - [ ] reseñas tipo foro donde cada usario tenga un perfil y pueda ver e intaracutar con las reseñas de los demas
-- [ ] Añadir docuemntcion swagger
+- [x] Añadir documentación swagger
 
 
 ---

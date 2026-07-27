@@ -7,7 +7,7 @@ import * as q from './reserva.queries.js';
 export const create = async (data, user) => {
 
   const {
-    id_unidad,
+    id_alojamiento,
     fecha_inicio,
     fecha_fin
   } = data;
@@ -23,68 +23,57 @@ export const create = async (data, user) => {
     };
   }
 
-  // obtener unidad
-  const unidadResult = await pool.query(
-    q.getUnidadById,
-    [id_unidad]
+  // obtener alojamiento
+  const alojamientoResult = await pool.query(
+    q.getAlojamientoById,
+    [id_alojamiento]
   );
 
-  const unidad = unidadResult.rows[0];
+  const alojamiento = alojamientoResult.rows[0];
 
-  if (!unidad) {
+  if (!alojamiento) {
     throw {
       status: 404,
-      message: 'Unit not found'
+      message: 'Alojamiento not found'
     };
   }
 
   // validar moderación
-  if (
-    unidad.estado !== 'aprobado' ||
-    unidad.alojamiento_estado_publicacion !== 'aprobado'
-  ) {
+  if (alojamiento.estado !== 'aprobado') {
     throw {
       status: 403,
       message: 'Content not approved'
     };
   }
 
-  // validar disponibilidad
-  if (!unidad.disponible) {
-    throw {
-      status: 400,
-      message: 'Unit not available'
-    };
-  }
-
-  // unidad privada
-  if (!unidad.es_compartido) {
+  // privado: una sola reserva activa en el rango
+  if (!alojamiento.es_compartido) {
 
     const overlap = await pool.query(
       q.checkReservaOverlap,
-      [id_unidad, fecha_inicio, fecha_fin]
+      [id_alojamiento, fecha_inicio, fecha_fin]
     );
 
     if (overlap.rows.length > 0) {
       throw {
         status: 400,
-        message: 'Unit already reserved for these dates'
+        message: 'Alojamiento already reserved for these dates'
       };
     }
   }
 
-  // unidad compartida
+  // compartido: cupos según capacidad
   else {
 
     const reservasActivas = await pool.query(
       q.countReservasActivas,
-      [id_unidad, fecha_inicio, fecha_fin]
+      [id_alojamiento, fecha_inicio, fecha_fin]
     );
 
     const totalReservas =
       parseInt(reservasActivas.rows[0].total);
 
-    if (totalReservas >= unidad.capacidad) {
+    if (totalReservas >= alojamiento.capacidad) {
       throw {
         status: 400,
         message: 'No spots available'
@@ -98,14 +87,14 @@ export const create = async (data, user) => {
 
   // calcular total
   const total =
-    noches * unidad.precio_noche;
+    noches * Number(alojamiento.precio_noche);
 
   // crear reserva
   const { rows } = await pool.query(
     q.createReserva,
     [
       user.id,
-      id_unidad,
+      id_alojamiento,
       fecha_inicio,
       fecha_fin,
       total

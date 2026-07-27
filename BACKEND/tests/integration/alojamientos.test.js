@@ -44,8 +44,10 @@ describe('Alojamientos API', () => {
     const alojamiento = await alojamientoService.create({
       titulo: 'Eco Cabaña',
       descripcion: 'Hermosa cabaña en la naturaleza',
-      precio: 100,
-      ubicacion: 'Colombia'
+      precio_noche: 100,
+      capacidad: 2,
+      ubicacion: 'Colombia',
+      categorias: [1]
     }, { id: hostUserId });
 
     // restaurar pool.query original

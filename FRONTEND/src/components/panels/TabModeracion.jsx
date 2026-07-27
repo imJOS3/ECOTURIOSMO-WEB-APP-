@@ -1,16 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
 import useModeracionStore from "../../stores/useModeracionStore";
+import useMensajesStore from "../../stores/useMensajesStore";
 import { apiFetch } from "../../utils/api";
 import { Badge, Spinner, EmptyState } from "../common/ui/index";
-import { SuccessIcon, ErrorIcon, RefreshIcon, ReviewIcon, CalendarIcon } from "../common/icons/icons";
+import { SuccessIcon, ErrorIcon, RefreshIcon, ReviewIcon, CalendarIcon, ChatIcon } from "../common/icons/icons";
+import StartChatModal from "../chat/StartChatModal";
 
 // ─── TabModeracion ─────────────────────────────────────────────────────────────
 export const TabModeracion = ({ tipoInicial = "alojamientos" }) => {
+  const startConversacion = useMensajesStore((s) => s.startConversacion);
+  const setDrawerOpen = useMensajesStore((s) => s.setDrawerOpen);
+  const openConversacion = useMensajesStore((s) => s.openConversacion);
   const [tipo, setTipo] = useState(tipoInicial);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
   const [msgType, setMsgType] = useState("success");
+  const [chatTarget, setChatTarget] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true); setMsg("");
@@ -21,14 +27,7 @@ export const TabModeracion = ({ tipoInicial = "alojamientos" }) => {
       } else {
         const aloj = await apiFetch("/alojamientos");
         const todosAloj = Array.isArray(aloj) ? aloj : [];
-        const unidadesNested = await Promise.all(
-          todosAloj.map((a) =>
-            apiFetch(`/unidades/alojamiento/${a.id}`)
-              .then((d) => (Array.isArray(d.data) ? d.data : []))
-              .catch(() => [])
-          )
-        );
-        setItems(unidadesNested.flat());
+
       }
     } catch (e) { setMsg(e.message); setMsgType("error"); }
     finally { setLoading(false); }
@@ -70,15 +69,29 @@ export const TabModeracion = ({ tipoInicial = "alojamientos" }) => {
         {est === "aprobado" && (
           <button className="btn btn-sm" onClick={() => pedirMotivo("suspensión", (m) => moderate(i.id, "suspender", m))}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><ReviewIcon fontSize="small" /> Suspender</span></button>
         )}
+        <button className="btn btn-sm" onClick={() => setChatTarget(i)} title="Mensaje al anfitrión">
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><ChatIcon fontSize="small" /> Mensaje</span>
+        </button>
       </div>
     );
+  };
+
+  const submitModChat = async (mensaje) => {
+    const conv = await startConversacion({
+      tipo: "moderacion",
+      id_alojamiento: chatTarget.id,
+      asunto: `Moderación: ${chatTarget.titulo}`,
+      mensaje_inicial: mensaje,
+    });
+    setChatTarget(null);
+    setDrawerOpen(true);
+    await openConversacion(conv.id);
   };
 
   return (
     <div>
       <div style={{ display: "flex", gap: 8, marginBottom: "1.5rem" }}>
         <button className={`btn btn-sm ${tipo === "alojamientos" ? "btn-primary" : ""}`} onClick={() => setTipo("alojamientos")}>Alojamientos</button>
-        <button className={`btn btn-sm ${tipo === "unidades" ? "btn-primary" : ""}`} onClick={() => setTipo("unidades")}>Unidades</button>
       </div>
 
       {msg && <div className={`alert alert-${msgType === "error" ? "error" : "success"}`} style={{ marginBottom: "1rem" }}>{msg}</div>}
@@ -113,6 +126,9 @@ export const TabModeracion = ({ tipoInicial = "alojamientos" }) => {
                             <button className="btn btn-sm btn-primary" onClick={() => moderate(i.id, "aprobar")}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><SuccessIcon fontSize="small" /> Aprobar</span></button>
                             <button className="btn btn-sm btn-danger" onClick={() => pedirMotivo("rechazo", (m) => moderate(i.id, "rechazar", m))}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><ErrorIcon fontSize="small" /> Rechazar</span></button>
                             <button className="btn btn-sm" onClick={() => pedirMotivo("suspensión", (m) => moderate(i.id, "suspender", m))}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><ReviewIcon fontSize="small" /> Suspender</span></button>
+                            <button className="btn btn-sm" onClick={() => setChatTarget(i)}>
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><ChatIcon fontSize="small" /> Mensaje</span>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -160,6 +176,17 @@ export const TabModeracion = ({ tipoInicial = "alojamientos" }) => {
           {items.length === 0 && <EmptyState icon={<ReviewIcon fontSize="inherit" />} message="Sin elementos para moderar" />}
         </>
       )}
+
+      {chatTarget && (
+        <StartChatModal
+          title="Mensaje de moderación"
+          subtitle={`Alojamiento #${chatTarget.id} · ${chatTarget.titulo}`}
+          defaultMessage="Hola, revisamos tu alojamiento y necesitamos algunos cambios antes de aprobarlo: "
+          confirmLabel="Enviar al anfitrión"
+          onSubmit={submitModChat}
+          onClose={() => setChatTarget(null)}
+        />
+      )}
     </div>
   );
 };
@@ -199,9 +226,9 @@ export const TabModeracionLog = () => {
     <div>
       <div style={{ display: "flex", gap: 8, marginBottom: "1.25rem", alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ display: "flex", gap: 6 }}>
-          {["todos", "alojamientos", "unidades"].map((t) => (
+          {["todos", "alojamientos"].map((t) => (
             <button key={t} className={`btn btn-sm ${filtroTipo === t ? "btn-primary" : ""}`} onClick={() => setFiltroTipo(t)}>
-              {t === "todos" ? "Todos" : t === "alojamientos" ? "Alojamientos" : "Unidades"}
+              {t === "todos" ? "Todos" : "Alojamientos"}
             </button>
           ))}
         </div>

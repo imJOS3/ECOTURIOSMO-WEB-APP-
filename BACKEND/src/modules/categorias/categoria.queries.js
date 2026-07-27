@@ -1,9 +1,10 @@
 export const createCategoria = `
   INSERT INTO categoria (
     nombre,
-    tipo
+    tipo,
+    icono
   )
-  VALUES ($1, $2)
+  VALUES ($1, $2, $3)
   RETURNING *;
 `;
 
@@ -23,8 +24,9 @@ export const updateCategoria = `
   UPDATE categoria
   SET
     nombre = $1,
-    tipo = $2
-  WHERE id = $3
+    tipo = $2,
+    icono = $3
+  WHERE id = $4
   RETURNING *;
 `;
 

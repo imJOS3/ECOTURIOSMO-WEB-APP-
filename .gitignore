@@ -1,5 +1,33 @@
+# =============================================================================
+# EcoTurismo — .gitignore
+# =============================================================================
+
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Builds
+dist/
+dist-ssr/
+build/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Entorno y secretos (NUNCA subir)
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,20 +35,40 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extens ions.json
-.idea
+# Sistema / editor
 .DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.local
 
-.env
+# Uploads / temporales locales
+uploads/
+tmp/
+temp/
+.cache/
+*.tmp
+*.temp
+
+# Dumps y backups de BD (sí se suben las migraciones .sql de /migrations)
+*.dump
+*.sql.gz
+*.backup
+*.bak
+!BACKEND/migrations/*.sql
+
+# Tests / artefactos
+.nyc_output/
+playwright-report/
+test-results/
+
+# SO / OneDrive ruido
+~$*
+*.lnk

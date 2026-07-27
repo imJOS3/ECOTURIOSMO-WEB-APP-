@@ -6,7 +6,6 @@ beforeEach(async () => {
       resena,
       pago,
       reserva,
-      unidad,
       alojamiento,
       categoria,
       usuario

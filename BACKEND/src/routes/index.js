@@ -8,17 +8,13 @@ import reservaRoutes from '../modules/reservas/reserva.routes.js';
 import pagoRoutes from '../modules/pagos/pago.routes.js';
 import resenaRoutes from '../modules/resenas/resena.routes.js';
 import categoriaRoutes from '../modules/categorias/categoria.routes.js';
-import unidadRoutes from '../modules/unidades/unidad.routes.js';
+import servicioRoutes from '../modules/servicios/servicio.routes.js';
 import moderacionRoutes from '../modules/moderacion/moderacion.routes.js';
-import unidadImagenRoutes from '../modules/unidades/unidad-imagen/unidad-imagen.routes.js';
 import alojamientoImagenRoutes from '../modules/alojamientos/alojamiento-imagen/alojamiento-imagen.routes.js';
-
-
+import mensajeRoutes from '../modules/mensajes/mensaje.routes.js';
 
 const router = Router();
 
-// agrupar rutas 
-router.use('/unidades', unidadRoutes);
 router.use('/auth', authRoutes);
 router.use('/usuarios', usuarioRoutes);
 router.use('/alojamientos', alojamientoRoutes);
@@ -26,17 +22,13 @@ router.use('/reservas', reservaRoutes);
 router.use('/pagos', pagoRoutes);
 router.use('/resenas', resenaRoutes);
 router.use('/categorias', categoriaRoutes);
+router.use('/servicios', servicioRoutes);
+router.use('/mensajes', mensajeRoutes);
 router.use('/admin/moderacion', moderacionRoutes);
-
-router.use(
-  '/unidad-imagen',
-  unidadImagenRoutes
-);
 
 router.use(
   '/alojamiento-imagen',
   alojamientoImagenRoutes
 );
-
 
 export default router;

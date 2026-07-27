@@ -14,11 +14,25 @@ const registerUser = (nombre, email, rol) => {
   });
 };
 
+const ensureCategoria = async () => {
+  const existing = await pool.query(
+    `SELECT id FROM categoria WHERE tipo = 'alojamiento' ORDER BY id ASC LIMIT 1`
+  );
+  if (existing.rows[0]) return existing.rows[0].id;
+
+  const created = await pool.query(
+    `INSERT INTO categoria (nombre, tipo) VALUES ($1, 'alojamiento') RETURNING id`,
+    [`Eco ${unique}`]
+  );
+  return created.rows[0].id;
+};
+
 describe('Moderacion API', () => {
-  it('should moderate alojamientos and unidades with public visibility and reservation rules', async () => {
+  it('should moderate alojamientos with public visibility and reservation rules', async () => {
     const adminEmail = makeEmail('admin_moderacion');
     const hostEmail = makeEmail('host_moderacion');
     const touristEmail = makeEmail('tourist_moderacion');
+    const categoriaId = await ensureCategoria();
 
     await registerUser('Admin Moderacion', adminEmail, 'admin');
     await registerUser('Host Moderacion', hostEmail, 'anfitrion');
@@ -49,27 +63,15 @@ describe('Moderacion API', () => {
         descripcion: 'Alojamiento para validar moderacion publica',
         ubicacion: 'Medellin',
         latitud: 6.2442,
-        longitud: -75.5812
+        longitud: -75.5812,
+        precio_noche: 150,
+        capacidad: 2,
+        es_compartido: false,
+        categorias: [categoriaId]
       });
 
     expect(alojamientoPendiente.statusCode).toBe(201);
-    expect(alojamientoPendiente.body.estado_publicacion).toBe('pendiente_revision');
-
-    const unidadPendiente = await request(app)
-      .post('/api/unidades')
-      .set('Authorization', `Bearer ${hostToken}`)
-      .send({
-        id_alojamiento: alojamientoPendiente.body.id,
-        nombre: 'Suite Moderacion',
-        tipo: 'habitacion',
-        descripcion: 'Unidad de prueba para moderacion',
-        capacidad: 2,
-        es_compartido: false,
-        precio_noche: 150
-      });
-
-    expect(unidadPendiente.statusCode).toBe(201);
-    expect(unidadPendiente.body.data.estado_publicacion).toBe('pendiente_revision');
+    expect(alojamientoPendiente.body.estado).toBe('pendiente_revision');
 
     const publicBefore = await request(app).get('/api/alojamientos');
     expect(publicBefore.statusCode).toBe(200);
@@ -87,26 +89,16 @@ describe('Moderacion API', () => {
       .post(`/api/admin/moderacion/alojamientos/${alojamientoPendiente.body.id}/aprobar`)
       .set('Authorization', `Bearer ${adminToken}`);
     expect(aprobarAlojamiento.statusCode).toBe(200);
-    expect(aprobarAlojamiento.body.estado_publicacion).toBe('aprobado');
-
-    const aprobarUnidad = await request(app)
-      .post(`/api/admin/moderacion/unidades/${unidadPendiente.body.data.id}/aprobar`)
-      .set('Authorization', `Bearer ${adminToken}`);
-    expect(aprobarUnidad.statusCode).toBe(200);
-    expect(aprobarUnidad.body.estado_publicacion).toBe('aprobado');
+    expect(aprobarAlojamiento.body.estado).toBe('aprobado');
 
     const visibleAfterApproval = await request(app).get('/api/alojamientos');
     expect(visibleAfterApproval.body.some((item) => item.id === alojamientoPendiente.body.id)).toBe(true);
-
-    const visibleUnitsAfterApproval = await request(app).get(`/api/unidades/alojamiento/${alojamientoPendiente.body.id}`);
-    expect(visibleUnitsAfterApproval.statusCode).toBe(200);
-    expect(visibleUnitsAfterApproval.body.data.some((item) => item.id === unidadPendiente.body.data.id)).toBe(true);
 
     const reservaExitosa = await request(app)
       .post('/api/reservas')
       .set('Authorization', `Bearer ${touristToken}`)
       .send({
-        id_unidad: unidadPendiente.body.data.id,
+        id_alojamiento: alojamientoPendiente.body.id,
         fecha_inicio: '2026-06-01',
         fecha_fin: '2026-06-03'
       });
@@ -121,7 +113,10 @@ describe('Moderacion API', () => {
         descripcion: 'Contenido para rechazo',
         ubicacion: 'Guatape',
         latitud: 6.2308,
-        longitud: -75.1586
+        longitud: -75.1586,
+        precio_noche: 90,
+        capacidad: 3,
+        categorias: [categoriaId]
       });
 
     const rechazo = await request(app)
@@ -130,32 +125,32 @@ describe('Moderacion API', () => {
       .send({ motivo: 'Información incompleta' });
 
     expect(rechazo.statusCode).toBe(200);
-    expect(rechazo.body.estado_publicacion).toBe('rechazado');
+    expect(rechazo.body.estado).toBe('rechazado');
     expect(rechazo.body.motivo_rechazo).toBe('Información incompleta');
 
     const suspendido = await request(app)
-      .post(`/api/admin/moderacion/unidades/${unidadPendiente.body.data.id}/suspender`)
+      .post(`/api/admin/moderacion/alojamientos/${alojamientoPendiente.body.id}/suspender`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ motivo: 'Mantenimiento' });
 
     expect(suspendido.statusCode).toBe(200);
-    expect(suspendido.body.estado_publicacion).toBe('suspendido');
+    expect(suspendido.body.estado).toBe('suspendido');
 
     const reservaBloqueada = await request(app)
       .post('/api/reservas')
       .set('Authorization', `Bearer ${touristToken}`)
       .send({
-        id_unidad: unidadPendiente.body.data.id,
+        id_alojamiento: alojamientoPendiente.body.id,
         fecha_inicio: '2026-06-10',
         fecha_fin: '2026-06-12'
       });
 
     expect(reservaBloqueada.statusCode).toBe(403);
 
-    const publicAfterSuspend = await request(app).get(`/api/unidades/alojamiento/${alojamientoPendiente.body.id}`);
-    expect(publicAfterSuspend.body.data).toHaveLength(0);
+    const publicAfterSuspend = await request(app).get('/api/alojamientos');
+    expect(publicAfterSuspend.body.some((item) => item.id === alojamientoPendiente.body.id)).toBe(false);
 
     const logs = await pool.query('SELECT * FROM moderacion_log ORDER BY id ASC');
-    expect(logs.rows.length).toBeGreaterThanOrEqual(4);
+    expect(logs.rows.length).toBeGreaterThanOrEqual(3);
   });
 });

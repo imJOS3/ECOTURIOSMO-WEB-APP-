@@ -2,9 +2,11 @@
 
 export const createAlojamiento = `
   INSERT INTO alojamiento (
-    id_anfitrion, titulo, descripcion, ubicacion, latitud, longitud, estado
+    id_anfitrion, titulo, descripcion, ubicacion, latitud, longitud,
+    precio_noche, capacidad, es_compartido, cupos_disponibles,
+    habitaciones, camas, banos, estado
   )
-  VALUES ($1, $2, $3, $4, $5, $6, $7)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
   RETURNING *;
 `;
 
@@ -13,12 +15,6 @@ export const getAllAlojamientos = `
   SELECT a.*
   FROM alojamiento a
   WHERE a.estado = 'aprobado'
-    AND EXISTS (
-      SELECT 1
-      FROM unidad u
-      WHERE u.id_alojamiento = a.id
-        AND u.estado = 'aprobado'
-    )
   ORDER BY created_at DESC;
 `;
 
@@ -46,15 +42,6 @@ export const getAlojamientoById = `
   SELECT * FROM alojamiento WHERE id = $1 AND estado = 'aprobado';
 `;
 
-// Público/turista -> aprobado y con al menos una unidad aprobada
-export const hasApprovedUnit = `
-  SELECT 1
-  FROM unidad
-  WHERE id_alojamiento = $1
-    AND estado = 'aprobado'
-  LIMIT 1;
-`;
-
 // Mis alojamientos (solo del anfitrión autenticado)
 export const getByAnfitrion = `
   SELECT * FROM alojamiento
@@ -62,7 +49,6 @@ export const getByAnfitrion = `
   ORDER BY created_at DESC;
 `;
 
-// Actualizar — sin precio (no existe en la tabla)
 export const updateAlojamiento = `
   UPDATE alojamiento
   SET
@@ -70,8 +56,15 @@ export const updateAlojamiento = `
     descripcion = $2,
     ubicacion = $3,
     latitud = $4,
-    longitud = $5
-  WHERE id = $6
+    longitud = $5,
+    precio_noche = $6,
+    capacidad = $7,
+    es_compartido = $8,
+    cupos_disponibles = $9,
+    habitaciones = $10,
+    camas = $11,
+    banos = $12
+  WHERE id = $13
   RETURNING *;
 `;
 

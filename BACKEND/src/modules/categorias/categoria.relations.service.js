@@ -41,25 +41,11 @@ export const setAlojamientoCategorias = (id, categorias) => replaceCategorias(
   categorias
 );
 
-export const setUnidadCategorias = (id, categorias) => replaceCategorias(
-  q.deleteUnidadCategorias,
-  q.insertUnidadCategoria,
-  id,
-  categorias
-);
-
 export const getAlojamientoCategorias = (id) => loadCategorias(q.getAlojamientoCategorias, id);
-
-export const getUnidadCategorias = (id) => loadCategorias(q.getUnidadCategorias, id);
 
 export const attachAlojamientoCategorias = async (alojamiento) => ({
   ...alojamiento,
   categorias: await getAlojamientoCategorias(alojamiento.id)
-});
-
-export const attachUnidadCategorias = async (unidad) => ({
-  ...unidad,
-  categorias: await getUnidadCategorias(unidad.id)
 });
 
 export const validateCategoriasExist = async (

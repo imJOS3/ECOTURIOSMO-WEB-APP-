@@ -15,7 +15,7 @@ export const AlojamientoPreviewSidebar = ({ previewItem, estado, saving, uploadi
       <Badge status={estado || "borrador"} />
       <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.75rem" }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-          <RefreshIcon fontSize="small" /> Después de aprobarse, podrás agregar unidades con su precio por noche.
+          <RefreshIcon fontSize="small" /> Después de aprobarse, los turistas podrán reservarlo por noche.
         </span>
       </p>
     </div>

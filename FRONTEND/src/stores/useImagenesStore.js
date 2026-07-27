@@ -11,9 +11,6 @@ export const useImagenesStore = create((set) => ({
   loadingByEntity: {},
   errorByEntity: {},
 
-  // =========================
-  // FETCH
-  // =========================
   fetchImagenes: async ({ entityType, id }) => {
     const key = entityKey(entityType, id);
 
@@ -23,9 +20,11 @@ export const useImagenesStore = create((set) => ({
     }));
 
     try {
-      const data = entityType === "alojamiento"
-        ? await imagenesService.fetchAlojamiento(id)
-        : await imagenesService.fetchUnidad(id);
+      if (entityType !== "alojamiento") {
+        throw new Error("Solo se admiten imágenes de alojamiento");
+      }
+
+      const data = await imagenesService.fetchAlojamiento(id);
 
       const items = Array.isArray(data?.data)
         ? data.data
@@ -48,9 +47,6 @@ export const useImagenesStore = create((set) => ({
     }
   },
 
-  // =========================
-  // UPLOAD
-  // =========================
   uploadImagenes: async ({ entityType, id, files }) => {
     const key = entityKey(entityType, id);
 
@@ -60,11 +56,12 @@ export const useImagenesStore = create((set) => ({
     }));
 
     try {
-      const data = entityType === "alojamiento"
-        ? await imagenesService.uploadAlojamiento(id, files)
-        : await imagenesService.uploadUnidad(id, files);
+      if (entityType !== "alojamiento") {
+        throw new Error("Solo se admiten imágenes de alojamiento");
+      }
 
-      // Soporta que el backend devuelva un solo objeto o un array
+      const data = await imagenesService.uploadAlojamiento(id, files);
+
       const newItems = Array.isArray(data?.data)
         ? data.data
         : data?.data
@@ -89,9 +86,6 @@ export const useImagenesStore = create((set) => ({
     }
   },
 
-  // =========================
-  // DELETE
-  // =========================
   deleteImagen: async ({ entityType, entityId, imageId }) => {
     const key = entityKey(entityType, entityId);
 
@@ -101,9 +95,11 @@ export const useImagenesStore = create((set) => ({
     }));
 
     try {
-      const result = entityType === "alojamiento"
-        ? await imagenesService.deleteAlojamiento(entityId, imageId)
-        : await imagenesService.deleteUnidad(entityId, imageId);
+      if (entityType !== "alojamiento") {
+        throw new Error("Solo se admiten imágenes de alojamiento");
+      }
+
+      const result = await imagenesService.deleteAlojamiento(entityId, imageId);
 
       set((state) => ({
         byEntity: {

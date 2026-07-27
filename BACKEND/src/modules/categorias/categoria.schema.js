@@ -8,6 +8,12 @@ export const categoriaSchema = Joi.object({
     .required(),
 
   tipo: Joi.string()
-    .valid('alojamiento', 'unidad')
-    .required()
+    .valid('alojamiento')
+    .required(),
+
+  icono: Joi.string()
+    .min(2)
+    .max(50)
+    .optional()
+    .default('check')
 });

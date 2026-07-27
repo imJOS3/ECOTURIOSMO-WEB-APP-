@@ -17,6 +17,7 @@ import BedroomParentOutlined from "@mui/icons-material/BedroomParentOutlined";
 import AdminPanelSettingsOutlined from "@mui/icons-material/AdminPanelSettingsOutlined";
 import FactCheckOutlined from "@mui/icons-material/FactCheckOutlined";
 import CottageOutlined from "@mui/icons-material/CottageOutlined";
+import ChatBubbleOutlineOutlined from "@mui/icons-material/ChatBubbleOutlineOutlined";
 // Nature icons are defined in icons.constants.js
 
 export const BrandIcon = NatureOutlined;
@@ -38,4 +39,5 @@ export const GroupIcon = GroupOutlined;
 export const BedIcon = BedroomParentOutlined;
 export const AdminIcon = AdminPanelSettingsOutlined;
 export const ReviewIcon = FactCheckOutlined;
+export const ChatIcon = ChatBubbleOutlineOutlined;
 

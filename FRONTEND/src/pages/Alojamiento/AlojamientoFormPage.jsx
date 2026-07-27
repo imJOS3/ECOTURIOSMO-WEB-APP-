@@ -1,17 +1,18 @@
-// src/pages/PageAlojamientoForm.jsx
-//
-
 import { useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { BackIcon, CalendarIcon } from "../../components/common/icons/icons";
 import { useAlojamientosStore } from "../../stores/useAlojamientosStore";
+import useAuthStore from "../../stores/useAuthStore";
 
 import { useInitialAlojamiento } from "../../components/Alojamiento/form/useInitialAlojamiento";
 import { useAlojamientoForm } from "../../components/Alojamiento/form/useAlojamientoForm";
+import { useAlojamientoDraft } from "../../components/Alojamiento/form/useAlojamientoDraft";
+import AlojamientoDraftBanner from "../../components/Alojamiento/form/AlojamientoDraftBanner";
 import { useImageGallery } from "../../components/common/imageGallery/useImageGallery";
 import AlojamientoInfoSection from "../../components/Alojamiento/form/AlojamientoInfoSection";
 import AlojamientoLocationSection from "../../components/Alojamiento/form/AlojamientoLocationSection";
 import AlojamientoCategoriesSection from "../../components/Alojamiento/form/AlojamientoCategoriesSection";
+import AlojamientoServicesSection from "../../components/Alojamiento/form/AlojamientoServicesSection";
 import ImageGallerySection from "../../components/common/imageGallery/ImageGallerySection";
 import AlojamientoPreviewSidebar from "../../components/Alojamiento/form/AlojamientoPreviewSidebar";
 
@@ -19,6 +20,7 @@ export const PageAlojamientoForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id: routeId } = useParams();
+  const user = useAuthStore((state) => state.user);
 
   const createAlojamiento = useAlojamientosStore((state) => state.createAlojamiento);
   const updateAlojamiento = useAlojamientosStore((state) => state.updateAlojamiento);
@@ -28,15 +30,48 @@ export const PageAlojamientoForm = () => {
     locationAlojamiento: location.state?.alojamiento,
   });
 
-  const { form, updateField, setCategorias, validate, buildPayload, dirty: formDirty, setDirty: setFormDirty } =
-    useAlojamientoForm(initialData);
+  const {
+    form,
+    updateField,
+    setCategorias,
+    setServicios,
+    hydrateForm,
+    resetForm,
+    validate,
+    buildPayload,
+    dirty: formDirty,
+    setDirty: setFormDirty,
+  } = useAlojamientoForm(initialData);
 
   const gallery = useImageGallery({ entityType: "alojamiento", entityId: initialData?.id, isEdit });
+
+  const {
+    promptOpen,
+    existingDraft,
+    lastSavedAt,
+    recoverDraft,
+    discardDraft,
+    clearDraft,
+  } = useAlojamientoDraft({
+    enabled: !isEdit && !loadingInitial,
+    userId: user?.id,
+    form,
+  });
 
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
   const dirty = formDirty || gallery.dirty;
+
+  const handleRecoverDraft = () => {
+    const draftForm = recoverDraft();
+    if (draftForm) hydrateForm(draftForm);
+  };
+
+  const handleDiscardDraft = () => {
+    discardDraft();
+    resetForm();
+  };
 
   const submit = async () => {
     const validationError = validate();
@@ -57,6 +92,7 @@ export const PageAlojamientoForm = () => {
       const alojamientoId = saved?.data?.id || saved?.id || initialData?.id;
       await gallery.commit(alojamientoId);
 
+      if (!isEdit) clearDraft();
       setFormDirty(false);
       navigate(`/alojamientos/${alojamientoId}`, { state: { alojamiento: saved?.data || saved } });
     } catch (requestError) {
@@ -66,7 +102,9 @@ export const PageAlojamientoForm = () => {
   };
 
   const handleCancel = () => {
-    if (dirty && !window.confirm("Tienes cambios sin guardar. ¿Salir de todas formas?")) return;
+    if (dirty && !window.confirm("Tienes cambios sin guardar. El borrador se conservará para después. ¿Salir?")) {
+      return;
+    }
     navigate(-1);
   };
 
@@ -84,6 +122,14 @@ export const PageAlojamientoForm = () => {
     imagenes: gallery.gallery.map((item) => ({ url: item.url })),
   };
 
+  const draftHint =
+    !isEdit && lastSavedAt
+      ? `Borrador guardado ${new Date(lastSavedAt).toLocaleTimeString("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`
+      : null;
+
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: "1.5rem 1rem 4rem" }}>
       <button className="btn btn-sm" onClick={handleCancel} style={{ marginBottom: "1.5rem" }}>
@@ -99,14 +145,25 @@ export const PageAlojamientoForm = () => {
         <p style={{ color: "var(--text-muted)" }}>
           {isEdit
             ? "Actualiza la información, categorías y fotos de tu alojamiento."
-            : "Completa la información de tu alojamiento. Podrás agregar unidades una vez sea aprobado."}
+            : "Completa la información de tu alojamiento, incluyendo precio y capacidad."}
         </p>
+        {draftHint && (
+          <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 6 }}>{draftHint}</p>
+        )}
       </div>
+
+      {!isEdit && promptOpen && (
+        <AlojamientoDraftBanner
+          draft={existingDraft}
+          onRecover={handleRecoverDraft}
+          onDiscard={handleDiscardDraft}
+        />
+      )}
 
       <div className="alert alert-amber" style={{ marginBottom: "1.5rem" }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
           <CalendarIcon fontSize="small" /> El alojamiento quedará en revisión hasta que un admin lo apruebe.
-          El precio se configura por unidad, no aquí.
+          {!isEdit && " Tus avances se guardan como borrador en este dispositivo."}
         </span>
       </div>
 
@@ -116,11 +173,17 @@ export const PageAlojamientoForm = () => {
         </div>
       )}
 
+      {promptOpen && !isEdit ? (
+        <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
+          Elige recuperar el borrador o descartarlo para continuar.
+        </p>
+      ) : (
       <div className="detail-layout">
         <div>
           <AlojamientoInfoSection form={form} onChange={updateField} />
           <AlojamientoLocationSection form={form} onChange={updateField} />
           <AlojamientoCategoriesSection value={form.categorias} onChange={setCategorias} />
+          <AlojamientoServicesSection value={form.servicios} onChange={setServicios} />
           <ImageGallerySection
             gallery={gallery.gallery}
             coverKey={gallery.effectiveCoverKey}
@@ -141,6 +204,7 @@ export const PageAlojamientoForm = () => {
           onCancel={handleCancel}
         />
       </div>
+      )}
     </div>
   );
 };

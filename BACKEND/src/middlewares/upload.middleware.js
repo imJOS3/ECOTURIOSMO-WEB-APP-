@@ -12,11 +12,11 @@ const storage = new CloudinaryStorage({
 
   params: {
 
-    folder: 'unidades',
+    folder: 'alojamientos',
 
     allowed_formats: [
       'jpg',
-      'jpeg',
+      'jpeg', 
       'png',
       'webp'
     ]

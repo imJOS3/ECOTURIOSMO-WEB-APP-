@@ -1,4 +1,3 @@
-// src/pages/PageHome.jsx
 import { useState, useEffect } from "react";
 import { apiFetch } from "../../utils/api";
 import AlojamientoCard from "../../components/Alojamiento/AlojamientoCard";
@@ -76,14 +75,16 @@ const PageHome = ({ user, setPage, onRegister }) => {
           </div>
         </div>
 
-        {/* CTA anfitrión */}
-        <div style={{ background: "var(--card-bg)", border: "0.5px solid var(--border)", borderRadius: "var(--radius)", padding: "2rem", textAlign: "center" }}>
-          <h3 className="display" style={{ fontSize: "1.4rem", marginBottom: "0.75rem" }}>¿Tienes un espacio en la naturaleza?</h3>
-          <p style={{ color: "var(--text-muted)", marginBottom: "1.25rem", maxWidth: 480, margin: "0 auto 1.25rem" }}>
-            Regístrate como anfitrión y comparte tu alojamiento ecológico con viajeros conscientes de todo el mundo.
-          </p>
-          <button className="btn btn-primary" onClick={onRegister}>Ser anfitrión</button>
-        </div>
+        {/* CTA anfitrión: solo visitantes y turistas (no anfitrión ni admin) */}
+        {(!user || user.rol === "turista") && (
+          <div style={{ background: "var(--card-bg)", border: "0.5px solid var(--border)", borderRadius: "var(--radius)", padding: "2rem", textAlign: "center" }}>
+            <h3 className="display" style={{ fontSize: "1.4rem", marginBottom: "0.75rem" }}>¿Tienes un espacio en la naturaleza?</h3>
+            <p style={{ color: "var(--text-muted)", marginBottom: "1.25rem", maxWidth: 480, margin: "0 auto 1.25rem" }}>
+              Regístrate como anfitrión y comparte tu alojamiento ecológico con viajeros conscientes de todo el mundo.
+            </p>
+            <button className="btn btn-primary" onClick={onRegister}>Ser anfitrión</button>
+          </div>
+        )}
       </div>
     </>
   );

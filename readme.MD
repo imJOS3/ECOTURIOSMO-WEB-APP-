@@ -9,16 +9,15 @@ Este proyecto organiza la lógica en dos carpetas principales:
 
 ## Qué cambió recientemente
 
-Se reforzó el frontend para soportar el flujo completo de alojamiento y unidades con:
+El modelo dual **alojamiento + unidad** se unificó: ahora solo existe **alojamiento** como entidad reservable.
 
-- autenticación centralizada con Zustand,
-- CRUD por módulos usando stores y services,
-- selección de categorías por tipo (`alojamiento` y `unidad`),
-- carga múltiple de imágenes con vista previa y eliminación,
-- panel dinámico por rol,
-- uso de Axios con `VITE_API_URL` para conectar con la API.
+- precio, capacidad y meta (`habitaciones`, `camas`, `baños`) viven en el alojamiento
+- las reservas usan `id_alojamiento`
+- se eliminó el módulo `/api/unidades` y la UI de unidades
+- categorías solo con `tipo: alojamiento`
+- panel dinámico por rol, stores Zustand y Axios con `VITE_API_URL`
 
-En paralelo, se corrigieron problemas de importación y referencias que causaban errores como `categoriaRelations is not defined` y fallos en formularios al editar datos nulos.
+Migración de base de datos: `BACKEND/migrations/001_unidad_to_alojamiento.sql`
 
 ## Arquitectura general
 
@@ -51,8 +50,7 @@ El frontend está organizado por capas:
 El backend sigue una arquitectura modular:
 
 - `src/routes/` para montar rutas.
-- `src/modules/` para separar dominios: auth, usuarios, alojamientos, unidades, reservas, pagos, reseñas, categorías y moderación.
-- `src/middlewares/` para autenticación, autorización, validación y manejo de errores.
+- `src/modules/` para separar dominios: auth, usuarios, alojamientos, reservas, pagos, reseñas, categorías y moderación.- `src/middlewares/` para autenticación, autorización, validación y manejo de errores.
 - `src/config/` para base de datos, Redis, Swagger y servicios externos.
 - `src/services/` para integraciones auxiliares como correo, mapas y almacenamiento.
 - `src/utils/` para JWT, paginación, logger y respuestas.
@@ -78,7 +76,6 @@ La UI ya no consulta la API de forma dispersa. En cambio:
 
 - `useAuthStore` maneja login, registro y perfil.
 - `useAlojamientosStore` maneja alojamientos.
-- `useUnidadesStore` maneja unidades.
 - `useReservasStore` maneja reservas.
 - `useUsuariosStore` maneja usuarios.
 - `usePagosStore` maneja pagos.
@@ -87,14 +84,9 @@ La UI ya no consulta la API de forma dispersa. En cambio:
 
 Esto simplifica el estado, centraliza errores y hace más fácil escalar el proyecto.
 
-### 3. Categorías por tipo
+### 3. Categorías
 
-Las categorías se separan por `tipo`:
-
-- `alojamiento`
-- `unidad`
-
-Así el formulario de alojamiento solo muestra categorías de alojamientos y el de unidad solo muestra categorías de unidades.
+Las categorías usan `tipo: alojamiento` (el tipo `unidad` ya no existe).
 
 ### 4. Imágenes
 
@@ -116,8 +108,7 @@ Actualmente el backend ya recibe imágenes por rutas dedicadas, pero aún falta 
 2. Si inicia sesión, se guarda el token y el perfil.
 3. Según el rol, el panel muestra opciones distintas:
    - `turista`: explorar, reservar, reseñar.
-   - `anfitrión`: gestionar alojamientos, unidades y ver reservas recibidas.
-   - `admin`: moderar contenido, gestionar usuarios y categorías.
+   - `anfitrión`: gestionar alojamientos y ver reservas recibidas.   - `admin`: moderar contenido, gestionar usuarios y categorías.
 4. Los formularios usan stores y services para crear/editar recursos.
 5. Las imágenes y categorías se cargan según el tipo de entidad.
 
@@ -134,50 +125,40 @@ Actualmente el backend ya recibe imágenes por rutas dedicadas, pero aún falta 
 
 ## Cómo ejecutar el proyecto
 
+Guía completa (estructura, migraciones, `.env`, Swagger y checklist antes de subir a GitHub):
+
+→ **[SETUP_LOCAL.md](SETUP_LOCAL.md)**
+
+Resumen rápido:
+
 ### Backend
 
 ```bash
-cd "C:\Users\melib\OneDrive\Documentos\proyectos jos\ECOTURISMO\BACKEND"
+cd BACKEND
+cp .env.example .env   # edita DB_*, JWT_SECRET, Cloudinary
 npm install
 npm run dev
 ```
 
+Swagger: http://localhost:3000/api/docs
+
 ### Frontend
 
 ```bash
-cd "C:\Users\melib\OneDrive\Documentos\proyectos jos\ECOTURISMO\FRONTEND"
+cd FRONTEND
+cp .env.example .env   # VITE_API_URL=http://localhost:3000/api
 npm install
 npm run dev
 ```
 
 ## Variables de entorno
 
-### Frontend
+Copia las plantillas (nunca subas tus `.env` reales):
 
-Archivo sugerido: `FRONTEND/.env`
+- `BACKEND/.env.example` → `BACKEND/.env`
+- `FRONTEND/.env.example` → `FRONTEND/.env`
 
-```env
-VITE_API_URL=http://localhost:3000/api
-```
-
-### Backend
-
-Configura en `BACKEND/.env` las variables que use tu despliegue:
-
-```env
-PORT=3000
-DATABASE_URL=...
-JWT_SECRET=...
-REDIS_URL=...
-```
-
-Si activas Cloudinary, agrega también sus credenciales:
-
-```env
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
-```
+Detalle de cada variable en [SETUP_LOCAL.md](SETUP_LOCAL.md).
 
 ## API principal
 
@@ -193,11 +174,10 @@ Módulos principales:
 - `POST /auth/login`
 - `GET /usuarios`
 - `GET /alojamientos`
-- `GET /unidades/alojamiento/:id`
 - `GET /reservas/mine`
 - `GET /pagos`
 - `GET /resenas/alojamiento/:id`
-- `GET /categorias?tipo=alojamiento|unidad`
+- `GET /categorias?tipo=alojamiento`
 - `POST /admin/moderacion/...`
 
 ## Estado actual
@@ -209,20 +189,19 @@ Lo que ya está conectado:
 - CRUD principal con stores,
 - categorías filtradas por tipo,
 - imágenes con preview y eliminación,
-- vistas de alojamientos y unidades mejoradas.
+- vistas de alojamientos mejoradas.
 
 ## Pendientes y siguientes pasos
 
 ### Prioridad alta
 
-- Integrar Cloudinary para subir imágenes a la nube.
-- Unificar definitivamente la carga de imágenes en backend y frontend con almacenamiento remoto.
-- Probar todos los endpoints de creación/edición de alojamientos y unidades con imágenes.
+- Ejecutar `BACKEND/migrations/001_unidad_to_alojamiento.sql` en PostgreSQL.
+- Completar datos del anfitrión y políticas en el detalle (ver `Pending_backend.MD`).
+- Probar creación/edición de alojamientos con imágenes y reservas con `id_alojamiento`.
 
 ### Prioridad media
 
 - Migrar los componentes que todavía usan llamadas directas a `apiFetch`.
-- Revisar moderación para dejar toda la lógica concentrada en stores y services.
 - Añadir pruebas más específicas para frontend y backend.
 
 ### Prioridad baja
@@ -230,3 +209,4 @@ Lo que ya está conectado:
 - Mejorar paginación y filtros.
 - Agregar favoritos.
 - Completar experiencia social de reseñas tipo foro.
+- Mejorar orden archivos css carpeta styles 
