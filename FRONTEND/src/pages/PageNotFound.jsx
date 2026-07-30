@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { BrandIcon, ExplorerIcon, HomeIcon } from "../../components/common/icons/icons";
-import "../../styles/page-404.css";
+import { BrandIcon, ExplorerIcon, HomeIcon } from "../components/common/icons/icons";
+import "../styles/page-404.css";
 
 /**
  * Página 404 — “te saliste del sendero” (ecoturismo).
