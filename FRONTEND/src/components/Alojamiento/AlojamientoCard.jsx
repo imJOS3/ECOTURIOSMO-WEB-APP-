@@ -83,6 +83,18 @@ const AlojamientoCard = ({ item, onClick, onImageClick, actions }) => {
 
         <p className="aloj-card-desc">{item.descripcion}</p>
 
+        {(item.capacidad || item.habitaciones || item.es_compartido != null) && (
+          <div className="aloj-card-meta">
+            {item.capacidad ? <span>Hasta {item.capacidad} huéspedes</span> : null}
+            {item.habitaciones ? <span>{item.habitaciones} hab.</span> : null}
+            {item.es_compartido === true ? (
+              <span>Compartido</span>
+            ) : item.es_compartido === false ? (
+              <span>Privado</span>
+            ) : null}
+          </div>
+        )}
+
         <div className="aloj-card-footer">
           <span className="aloj-card-price">
             Desde <strong>${formatCurrency(item.precio_desde || item.precio_noche || 0)}</strong>

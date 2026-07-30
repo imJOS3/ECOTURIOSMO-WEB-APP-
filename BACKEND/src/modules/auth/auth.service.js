@@ -1,47 +1,69 @@
 import pool from '../../config/database.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../utils/jwt.js';
+import { validateRegisterPayload } from './auth.validation.js';
 
 const SALT_ROUNDS = 10;
 const ROLES_VALIDOS = ['turista', 'anfitrion', 'admin'];
 
+const USER_SAFE_COLS =
+  'id, nombre, email, rol, avatar_url, telefono, fecha_nacimiento, ciudad, created_at';
+
 /**
  * Registrar usuario
  */
-export const register = async ({ nombre, email, password, rol }) => {
-  // 🔍 Validaciones básicas
-  if (!nombre || !email || !password) {
-    throw { status: 400, message: 'Datos incompletos' };
+export const register = async (body) => {
+  const validated = validateRegisterPayload(body);
+  if (validated.error) {
+    throw { status: 400, message: validated.error };
   }
 
-  // 🔒 Normalizar email
-  const emailLower = email.toLowerCase();
+  const {
+    nombre,
+    email,
+    password,
+    telefono,
+    fecha_nacimiento,
+    ciudad,
+    rol,
+  } = validated.data;
 
-  // 🔎 Verificar si ya existe
-  const exists = await pool.query(
+  const existsEmail = await pool.query(
     'SELECT id FROM usuario WHERE email=$1',
-    [emailLower]
+    [email]
   );
-
-  if (exists.rows.length > 0) {
+  if (existsEmail.rows.length > 0) {
     throw { status: 409, message: 'El usuario ya existe' };
   }
 
-  //  Hash de contraseña
   const hash = await bcrypt.hash(password, SALT_ROUNDS);
-
-  //  Validar rol (por defecto turista)
   const rolFinal = ROLES_VALIDOS.includes(rol) ? rol : 'turista';
 
-  //  Insertar usuario
-  const result = await pool.query(
-    `INSERT INTO usuario(nombre,email,password_hash,rol)
-     VALUES($1,$2,$3,$4)
-     RETURNING id, nombre, email, rol`,
-    [nombre, emailLower, hash, rolFinal]
-  );
-
-  return result.rows[0];
+  try {
+    const result = await pool.query(
+      `INSERT INTO usuario(
+         nombre, email, password_hash, rol,
+         telefono, fecha_nacimiento, ciudad, acepta_terminos_at
+       )
+       VALUES($1,$2,$3,$4,$5,$6,$7,NOW())
+       RETURNING ${USER_SAFE_COLS}`,
+      [
+        nombre,
+        email,
+        hash,
+        rolFinal,
+        telefono,
+        fecha_nacimiento,
+        ciudad,
+      ]
+    );
+    return result.rows[0];
+  } catch (err) {
+    if (err.code === '23505') {
+      throw { status: 409, message: 'El email ya está registrado' };
+    }
+    throw err;
+  }
 };
 
 /**
@@ -61,7 +83,6 @@ export const login = async ({ email, password }) => {
 
   const user = result.rows[0];
 
-  //  No revelar si el usuario existe o no
   if (!user) {
     throw { status: 401, message: 'Credenciales inválidas' };
   }
@@ -72,17 +93,21 @@ export const login = async ({ email, password }) => {
     throw { status: 401, message: 'Credenciales inválidas' };
   }
 
-  //  Generar token
   const token = generateToken({
     id: user.id,
-    rol: user.rol
+    rol: user.rol,
   });
 
-  //  No devolver password
-  const { password_hash, ...userSafe } = user;
+  const {
+    password_hash,
+    avatar_public_id,
+    tipo_documento,
+    numero_documento,
+    ...userSafe
+  } = user;
 
   return {
     user: userSafe,
-    token
+    token,
   };
 };

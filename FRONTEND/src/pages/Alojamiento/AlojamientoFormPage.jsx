@@ -187,9 +187,12 @@ export const PageAlojamientoForm = () => {
           <ImageGallerySection
             gallery={gallery.gallery}
             coverKey={gallery.effectiveCoverKey}
+            activeEspacio={gallery.activeEspacio}
+            onActiveEspacioChange={gallery.setActiveEspacio}
             onAddFiles={gallery.addFiles}
             onRemove={gallery.removeImage}
             onSetCover={gallery.setCover}
+            onSetEspacio={gallery.setEspacio}
             dragHandlers={gallery.dragHandlers}
           />
         </div>

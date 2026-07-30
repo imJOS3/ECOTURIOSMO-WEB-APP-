@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import UserAvatar from "../common/UserAvatar";
 
 /**
  * Menú desplegable del avatar: perfil, soporte y cerrar sesión.
@@ -37,9 +38,7 @@ const ProfileMenu = ({ user, onConfigurarPerfil, onSoporte, onRequestLogout }) =
         aria-expanded={open}
         title="Perfil"
       >
-        <span className="avatar profile-menu-avatar">
-          {user?.nombre?.[0]?.toUpperCase() || "U"}
-        </span>
+        <UserAvatar user={user} className="profile-menu-avatar" />
         <span className="profile-menu-name">{user?.nombre?.split(" ")[0] || "Perfil"}</span>
         <span className="profile-menu-caret" aria-hidden>
           ▾

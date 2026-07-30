@@ -316,6 +316,34 @@
 }
 
 /* ── Galería tipo grid Airbnb ── */
+.aloj-gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0.85rem;
+}
+.aloj-gallery-filter {
+  border: 0.5px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.aloj-gallery-filter:hover {
+  background: var(--green-light);
+  color: var(--green);
+}
+.aloj-gallery-filter.active {
+  background: var(--green-light);
+  border-color: color-mix(in srgb, var(--green) 40%, var(--border));
+  color: var(--green);
+  font-weight: 500;
+}
+
 .aloj-gallery-grid {
   position: relative;
   display: grid;

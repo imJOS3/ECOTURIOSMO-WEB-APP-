@@ -1,18 +1,8 @@
-// src/components/common/ui/ImageLightbox.jsx
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
+import { labelEspacio } from "../../../constants/espaciosFoto";
 
 /**
- * ImageLightbox
- * Modal simple para ver imágenes en grande con navegación (flechas, teclado, click fuera para cerrar).
- *
- * Uso:
- *   const [lightbox, setLightbox] = useState(null); // { images: [...], index: 0 } | null
- *   <ImageLightbox
- *     images={lightbox?.images}
- *     index={lightbox?.index}
- *     onClose={() => setLightbox(null)}
- *     onIndexChange={(i) => setLightbox((s) => ({ ...s, index: i }))}
- *   />
+ * ImageLightbox — ver fotos en grande; muestra el espacio si existe.
  */
 const ImageLightbox = ({ images, index, onClose, onIndexChange }) => {
   const isOpen = Array.isArray(images) && images.length > 0 && index != null;
@@ -38,9 +28,14 @@ const ImageLightbox = ({ images, index, onClose, onIndexChange }) => {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isOpen, onClose, goNext, goPrev]);
 
-  if (!isOpen) return null;
+  const current = isOpen ? images[index] : null;
+  const src = typeof current === "string" ? current : current?.url || current?.imagen_url;
+  const espacioLabel = useMemo(() => {
+    if (!current || typeof current === "string") return null;
+    return current.espacio ? labelEspacio(current.espacio) : null;
+  }, [current]);
 
-  const src = typeof images[index] === "string" ? images[index] : images[index]?.url || images[index]?.imagen_url;
+  if (!isOpen) return null;
 
   return (
     <div
@@ -79,12 +74,18 @@ const ImageLightbox = ({ images, index, onClose, onIndexChange }) => {
         </button>
       )}
 
-      <img
-        src={src}
-        alt=""
-        onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: "90vw", maxHeight: "85vh", objectFit: "contain", borderRadius: 8 }}
-      />
+      <div onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
+        {espacioLabel && (
+          <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "0.9rem", marginBottom: 10 }}>
+            {espacioLabel}
+          </p>
+        )}
+        <img
+          src={src}
+          alt={espacioLabel || ""}
+          style={{ maxWidth: "90vw", maxHeight: "80vh", objectFit: "contain", borderRadius: 8 }}
+        />
+      </div>
 
       {images.length > 1 && (
         <button

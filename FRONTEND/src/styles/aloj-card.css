@@ -113,6 +113,15 @@
     overflow: hidden;
   }
 
+  .aloj-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: -4px 0 10px;
+  }
+
   .aloj-card-footer {
     margin-top: auto;
     display: flex;

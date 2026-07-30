@@ -251,6 +251,27 @@ body {
   font-size: .9rem;
 }
 .cuenta-list li { margin-bottom: 6px; }
+.perfil-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+.perfil-avatar-preview {
+  width: 88px !important;
+  height: 88px !important;
+  font-size: 2rem !important;
+}
+.perfil-avatar-actions {
+  flex: 1;
+  min-width: 180px;
+}
+.perfil-avatar-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
 .faq-list { display: flex; flex-direction: column; gap: 8px; }
 .faq-item {
   border: 0.5px solid var(--border);
@@ -689,6 +710,60 @@ body {
 .modal-subtitle { font-size: .85rem; color: var(--text-muted); margin-top: 4px; }
 .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); padding: 4px; line-height: 1; }
 
+/* ── Auth social ─────────────────────────────────────────────────────────── */
+.auth-modal { max-width: 440px; }
+.auth-modal-wide { max-width: 560px; max-height: min(92vh, 880px); overflow-y: auto; }
+.auth-terms { align-items: flex-start; margin: 0.25rem 0 0.5rem; font-size: .82rem; line-height: 1.4; }
+.auth-terms input { margin-top: 3px; }
+.social-auth-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+.social-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border-mid);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: .88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.social-btn:hover {
+  background: var(--surface);
+  border-color: color-mix(in srgb, var(--green) 35%, var(--border-mid));
+  transform: translateY(-1px);
+}
+.social-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.social-btn-apple { background: #111; color: #fff; border-color: #111; }
+.social-btn-apple:hover { background: #222; border-color: #222; color: #fff; }
+.social-btn-facebook { border-color: color-mix(in srgb, #1877F2 35%, var(--border-mid)); }
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0.35rem 0 1rem;
+  color: var(--text-muted);
+  font-size: .78rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-mid);
+}
+.auth-divider span { white-space: nowrap; }
+
 /* ── Forms ───────────────────────────────────────────────────────────────── */
 .form-group { margin-bottom: 1rem; }
 .form-label { display: block; font-size: .8rem; font-weight: 500; margin-bottom: 6px; color: var(--text); }
@@ -894,6 +969,11 @@ tr:hover td { background: var(--surface); }
   display: flex; align-items: center; justify-content: center;
   font-size: 1.4rem; font-weight: 600; color: var(--green);
   font-family: 'Playfair Display', serif; flex-shrink: 0;
+}
+.avatar-img {
+  object-fit: cover;
+  padding: 0;
+  display: block;
 }
 
 /* ── Stars ───────────────────────────────────────────────────────────────── */

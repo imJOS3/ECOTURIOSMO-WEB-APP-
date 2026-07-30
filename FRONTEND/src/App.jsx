@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { getUser } from "./utils/api";
 import { useTheme } from "./hooks/useTheme";
 import Navbar from "./components/layout/Navbar";
@@ -15,6 +15,7 @@ import PageAlojamientoDetail from "./pages/Alojamiento/PageAlojamientoDetail";
 import AlojamientoFormPage from "./pages/Alojamiento/AlojamientoFormPage";
 import PagePerfil from "./pages/cuenta/PagePerfil";
 import PageSoporte from "./pages/cuenta/PageSoporte";
+import PageNotFound from "./pages/PageNotFound";
 import useAuthStore from "./stores/useAuthStore";
 
 import "./styles/global.css";
@@ -151,7 +152,7 @@ export default function App() {
             )}
           />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
 
         <footer className="footer">

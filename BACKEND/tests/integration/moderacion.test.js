@@ -1,17 +1,23 @@
 import request from 'supertest';
 import app from '../../app.js';
 import pool from '../../src/config/database.js';
+import { registerPayload } from '../helpers/registerPayload.js';
 
 const unique = Date.now();
 const makeEmail = (prefix) => `${prefix}+${unique}@test.com`;
 
+let docCounter = 0;
 const registerUser = (nombre, email, rol) => {
-  return request(app).post('/api/auth/register').send({
-    nombre,
-    email,
-    password: '123456',
-    rol
-  });
+  docCounter += 1;
+  return request(app).post('/api/auth/register').send(
+    registerPayload({
+      nombre,
+      email,
+      password: 'Test1234!',
+      rol,
+      suffix: `${unique}${docCounter}`,
+    })
+  );
 };
 
 const ensureCategoria = async () => {
@@ -40,15 +46,15 @@ describe('Moderacion API', () => {
 
     const adminLogin = await request(app).post('/api/auth/login').send({
       email: adminEmail,
-      password: '123456'
+      password: 'Test1234!'
     });
     const hostLogin = await request(app).post('/api/auth/login').send({
       email: hostEmail,
-      password: '123456'
+      password: 'Test1234!'
     });
     const touristLogin = await request(app).post('/api/auth/login').send({
       email: touristEmail,
-      password: '123456'
+      password: 'Test1234!'
     });
 
     const adminToken = adminLogin.body.token;

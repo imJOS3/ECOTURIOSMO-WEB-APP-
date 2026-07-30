@@ -1,0 +1,155 @@
+/* Explorar — filtros de búsqueda */
+
+.exp-page {
+  width: 100%;
+}
+
+.exp-filters {
+  margin-bottom: 1.5rem;
+}
+
+.exp-filters-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+
+.exp-search {
+  flex: 1 1 240px;
+  min-width: 180px;
+  max-width: 420px;
+}
+
+.exp-sort {
+  flex: 0 1 200px;
+  min-width: 160px;
+}
+
+.exp-more-btn.active {
+  background: var(--green-light);
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 40%, var(--border));
+}
+
+.exp-clear {
+  color: var(--text-muted);
+}
+
+.exp-ambientes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0.35rem;
+}
+
+.exp-ambiente {
+  border: 0.5px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.exp-ambiente:hover {
+  background: var(--green-light);
+  color: var(--green);
+}
+
+.exp-ambiente.active {
+  background: var(--green-light);
+  border-color: color-mix(in srgb, var(--green) 45%, var(--border));
+  color: var(--green);
+  font-weight: 500;
+}
+
+.exp-panel {
+  margin-top: 1rem;
+  padding: 1.15rem 1.2rem;
+  background: var(--card-bg);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.exp-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.9rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.exp-price-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.form-hint-inline {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.exp-seg {
+  display: flex;
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.exp-seg-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.exp-seg-btn + .exp-seg-btn {
+  border-left: 0.5px solid var(--border);
+}
+
+.exp-seg-btn.active {
+  background: var(--green-light);
+  color: var(--green);
+  font-weight: 500;
+}
+
+.exp-block {
+  margin-top: 0.85rem;
+}
+
+.exp-block-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 0.55rem;
+}
+
+.exp-chips .chip-select {
+  padding: 7px 12px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .exp-filters-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .exp-search,
+  .exp-sort {
+    max-width: none;
+    flex: 1 1 auto;
+  }
+}

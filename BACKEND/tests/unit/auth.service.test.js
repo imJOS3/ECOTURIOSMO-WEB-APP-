@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '../../app.js';
 import pool from '../../src/config/database.js';
+import { registerPayload } from '../helpers/registerPayload.js';
 
 let tokenTurista;
 let tokenAnfitrion;
@@ -18,26 +19,32 @@ describe('Roles & Authorization', () => {
     await pool.query('DELETE FROM usuario WHERE email=$1 OR email=$2 OR email=$3', [emailTurista, emailAnfitrion, emailAdmin]);
 
     // 👤 crear usuarios únicos y usar la respuesta para obtener id/rol
-    const resTurista = await request(app).post('/api/auth/register').send({
-      nombre: 'Turista',
-      email: emailTurista,
-      password: '123456',
-      rol: 'turista'
-    });
+    const resTurista = await request(app).post('/api/auth/register').send(
+      registerPayload({
+        nombre: 'Turista Prueba',
+        email: emailTurista,
+        rol: 'turista',
+        suffix: `${unique}1`,
+      })
+    );
 
-    const resAnfitrion = await request(app).post('/api/auth/register').send({
-      nombre: 'Anfitrion',
-      email: emailAnfitrion,
-      password: '123456',
-      rol: 'anfitrion'
-    });
+    const resAnfitrion = await request(app).post('/api/auth/register').send(
+      registerPayload({
+        nombre: 'Anfitrion Prueba',
+        email: emailAnfitrion,
+        rol: 'anfitrion',
+        suffix: `${unique}2`,
+      })
+    );
 
-    const resAdmin = await request(app).post('/api/auth/register').send({
-      nombre: 'Admin',
-      email: emailAdmin,
-      password: '123456',
-      rol: 'admin'
-    });
+    const resAdmin = await request(app).post('/api/auth/register').send(
+      registerPayload({
+        nombre: 'Admin Prueba',
+        email: emailAdmin,
+        rol: 'admin',
+        suffix: `${unique}3`,
+      })
+    );
 
     const { generateToken } = await import('../../src/utils/jwt.js');
 

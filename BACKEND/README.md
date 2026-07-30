@@ -80,7 +80,7 @@ En Swagger: **Authorize** → pega el JWT del login (`Bearer` se añade solo).
 ---
 
 **Auth**
-- POST `/api/auth/register` — Registrar usuario (body: `nombre`, `email`, `password`, `rol` opcional).
+- POST `/api/auth/register` — Registrar usuario (body: `nombre`, `email`, `password`, `telefono`, `fecha_nacimiento`, `ciudad`, `acepta_terminos`, `rol` opcional).
 - POST `/api/auth/login` — Autenticar y recibir `{ user, token }`.
 
 **Usuarios** (`/api/usuarios`)

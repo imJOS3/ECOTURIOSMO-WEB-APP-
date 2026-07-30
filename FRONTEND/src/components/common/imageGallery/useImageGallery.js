@@ -1,10 +1,7 @@
-// src/components/alojamientos/form/useImageGallery.js
-//
-// Única responsabilidad: el catálogo de imágenes (agregar, quitar, reordenar,
-// elegir portada) y cómo se persiste al guardar (subir nuevas, reordenar,
-// marcar portada). No sabe nada de los demás campos del formulario.
+// Catálogo de imágenes: agregar, quitar, reordenar, portada y espacio.
 import { useEffect, useRef, useState } from "react";
 import { useImagenesStore } from "../../../stores/useImagenesStore";
+import { DEFAULT_ESPACIO_FOTO } from "../../../constants/espaciosFoto";
 
 const toGalleryItems = (images) =>
   (images || []).map((image, index) => ({
@@ -12,17 +9,20 @@ const toGalleryItems = (images) =>
     kind: "existing",
     id: image.id ?? image.public_id,
     url: image.url || image.secure_url || image.path,
+    espacio: image.espacio || DEFAULT_ESPACIO_FOTO,
   }));
 
 export const useImageGallery = ({ entityType = "alojamiento", entityId, isEdit }) => {
   const fetchImagenes = useImagenesStore((state) => state.fetchImagenes);
   const uploadImagenes = useImagenesStore((state) => state.uploadImagenes);
   const deleteImagen = useImagenesStore((state) => state.deleteImagen);
-  const reorderImagenes = useImagenesStore((state) => state.reorderImagenes); // opcional, puede no existir
-  const setImagenPrincipal = useImagenesStore((state) => state.setImagenPrincipal); // opcional
+  const updateImagenEspacio = useImagenesStore((state) => state.updateImagenEspacio);
+  const reorderImagenes = useImagenesStore((state) => state.reorderImagenes);
+  const setImagenPrincipal = useImagenesStore((state) => state.setImagenPrincipal);
 
   const [gallery, setGallery] = useState([]);
   const [coverKey, setCoverKey] = useState(null);
+  const [activeEspacio, setActiveEspacio] = useState(DEFAULT_ESPACIO_FOTO);
   const [uploading, setUploading] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
@@ -48,7 +48,7 @@ export const useImageGallery = ({ entityType = "alojamiento", entityId, isEdit }
 
   const effectiveCoverKey = coverKey || gallery[0]?.key || null;
 
-  const addFiles = (fileList) => {
+  const addFiles = (fileList, espacio = activeEspacio) => {
     const files = Array.from(fileList || []);
     if (files.length === 0) return;
     const newItems = files.map((file, index) => ({
@@ -56,6 +56,7 @@ export const useImageGallery = ({ entityType = "alojamiento", entityId, isEdit }
       kind: "new",
       file,
       url: URL.createObjectURL(file),
+      espacio: espacio || DEFAULT_ESPACIO_FOTO,
     }));
     setGallery((items) => [...items, ...newItems]);
     setDirty(true);
@@ -78,6 +79,26 @@ export const useImageGallery = ({ entityType = "alojamiento", entityId, isEdit }
       setDirty(true);
     } catch (deleteError) {
       setError(deleteError.message);
+    }
+  };
+
+  const setEspacio = async (item, espacio) => {
+    setGallery((items) =>
+      items.map((i) => (i.key === item.key ? { ...i, espacio } : i))
+    );
+    setDirty(true);
+
+    if (item.kind === "existing" && entityId) {
+      try {
+        await updateImagenEspacio({
+          entityType,
+          entityId,
+          imageId: item.id,
+          espacio,
+        });
+      } catch (err) {
+        setError(err.message || "No se pudo actualizar el espacio");
+      }
     }
   };
 
@@ -109,16 +130,20 @@ export const useImageGallery = ({ entityType = "alojamiento", entityId, isEdit }
     },
   };
 
-  // Sube las imágenes nuevas y, si el store lo soporta, persiste orden/portada.
-  // Los métodos opcionales se llaman solo si existen, así este hook funciona
-  // igual aunque el backend todavía no tenga esos endpoints.
   const commit = async (finalEntityId) => {
-    const newFiles = gallery.filter((item) => item.kind === "new").map((item) => item.file);
+    const newItems = gallery.filter((item) => item.kind === "new");
 
-    if (finalEntityId && newFiles.length > 0) {
+    if (finalEntityId && newItems.length > 0) {
       setUploading(true);
       try {
-        await uploadImagenes({ entityType, id: finalEntityId, files: newFiles });
+        await uploadImagenes({
+          entityType,
+          id: finalEntityId,
+          items: newItems.map((item) => ({
+            file: item.file,
+            espacio: item.espacio || DEFAULT_ESPACIO_FOTO,
+          })),
+        });
       } finally {
         setUploading(false);
       }
@@ -144,11 +169,14 @@ export const useImageGallery = ({ entityType = "alojamiento", entityId, isEdit }
   return {
     gallery,
     effectiveCoverKey,
+    activeEspacio,
+    setActiveEspacio,
     uploading,
     dirty,
     error,
     addFiles,
     removeImage,
+    setEspacio,
     setCover,
     dragHandlers,
     commit,

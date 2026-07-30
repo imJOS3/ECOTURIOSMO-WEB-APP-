@@ -1,38 +1,25 @@
 import { Router } from 'express';
-
 import * as ctrl from './alojamiento-imagen.controller.js';
-
 import auth from '../../../middlewares/auth.middleware.js';
-
 import { checkRole } from '../../../middlewares/role.middleware.js';
-
 import validate from '../../../middlewares/validate.middleware.js';
-
 import upload from '../../../middlewares/upload.middleware.js';
-
 import {
-  createAlojamientoImagenSchema
+  createAlojamientoImagenSchema,
+  updateEspacioSchema,
 } from './alojamiento-imagen.schema.js';
 
 const router = Router();
 
-
-// =========================
-// SUBIR IMAGEN
-// =========================
-
+// multer primero: parsea multipart y deja id_alojamiento / espacio en req.body
 router.post(
   '/',
   auth,
   checkRole('anfitrion'),
-  validate(createAlojamientoImagenSchema),
   upload.single('imagen'),
+  validate(createAlojamientoImagenSchema),
   ctrl.create
 );
-
-// =========================
-// ACTUALIZAR
-// =========================
 
 router.put(
   '/:id',
@@ -42,19 +29,18 @@ router.put(
   ctrl.update
 );
 
-// =========================
-// OBTENER IMAGENES
-// =========================
+router.patch(
+  '/:id/espacio',
+  auth,
+  checkRole('anfitrion'),
+  validate(updateEspacioSchema),
+  ctrl.updateEspacio
+);
 
 router.get(
   '/alojamiento/:id_alojamiento',
   ctrl.getByAlojamiento
 );
-
-
-// =========================
-// ELIMINAR
-// =========================
 
 router.delete(
   '/:id',

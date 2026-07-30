@@ -1,39 +1,34 @@
-  import { apiFetch, apiUpload } from "../utils/api";
+import { apiFetch, apiUpload } from "../utils/api";
+import { DEFAULT_ESPACIO_FOTO } from "../constants/espaciosFoto";
 
-  // Sube varios archivos en paralelo, uno por request, respetando el
-  // contrato actual del backend: campo "imagen" (singular) + el id de
-  // la entidad dueña en el body (requerido por el schema de validación).
-  const uploadImages = async (path, files, ownerField, ownerId) => {
-    return Promise.all(
-      files.map((file) => {
-        const formData = new FormData();
-        formData.append("imagen", file);
-        formData.append(ownerField, ownerId);
-        return apiUpload(path, formData);
-      })
-    );
-  };
-  
-  
+// items: Array<{ file: File, espacio?: string }>
+const uploadImages = async (path, items, ownerField, ownerId) => {
+  return Promise.all(
+    items.map((item) => {
+      const file = item?.file || item;
+      const espacio = item?.espacio || DEFAULT_ESPACIO_FOTO;
+      const formData = new FormData();
+      formData.append("imagen", file);
+      formData.append(ownerField, ownerId);
+      formData.append("espacio", espacio);
+      return apiUpload(path, formData);
+    })
+  );
+};
 
-  export const imagenesService = {
-    // =========================
-    // FETCH
-    // =========================
-    fetchAlojamiento: (id) =>
-      apiFetch(`/alojamiento-imagen/alojamiento/${id}`),
+export const imagenesService = {
+  fetchAlojamiento: (id) =>
+    apiFetch(`/alojamiento-imagen/alojamiento/${id}`),
 
+  uploadAlojamiento: (id, items) =>
+    uploadImages("/alojamiento-imagen", items, "id_alojamiento", id),
 
-    // =========================
-    // UPLOAD
-    // =========================
-    uploadAlojamiento: (id, files) =>
-      uploadImages("/alojamiento-imagen", files, "id_alojamiento", id),
+  updateEspacio: (imageId, espacio) =>
+    apiFetch(`/alojamiento-imagen/${imageId}/espacio`, {
+      method: "PATCH",
+      body: JSON.stringify({ espacio }),
+    }),
 
-
-    // =========================
-    // DELETE
-    // =========================
-    deleteAlojamiento: (idAlojamiento, imageId) =>
-      apiFetch(`/alojamiento-imagen/${imageId}`, { method: "DELETE" }),
-  };
+  deleteAlojamiento: (idAlojamiento, imageId) =>
+    apiFetch(`/alojamiento-imagen/${imageId}`, { method: "DELETE" }),
+};

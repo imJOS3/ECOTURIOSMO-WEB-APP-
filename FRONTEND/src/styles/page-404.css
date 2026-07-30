@@ -1,0 +1,251 @@
+/* ── Página 404 — sendero perdido ───────────────────────────────────────── */
+
+.nf-page {
+  position: relative;
+  flex: 1;
+  min-height: calc(100vh - 64px - 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2.5rem 1.5rem 8rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--green-mid) 35%, transparent), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 90% 30%, color-mix(in srgb, var(--teal) 12%, transparent), transparent 55%),
+    linear-gradient(180deg, var(--green-light) 0%, var(--surface) 55%, color-mix(in srgb, var(--teal-light) 60%, var(--surface)) 100%);
+}
+
+.nf-sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.nf-cloud {
+  position: absolute;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--white) 55%, transparent);
+  filter: blur(2px);
+  opacity: 0.55;
+  animation: nf-drift 28s ease-in-out infinite;
+}
+.nf-cloud-a {
+  width: 140px;
+  height: 36px;
+  top: 12%;
+  left: -5%;
+}
+.nf-cloud-b {
+  width: 90px;
+  height: 26px;
+  top: 22%;
+  right: 8%;
+  animation-duration: 36s;
+  animation-direction: reverse;
+  opacity: 0.4;
+}
+
+.nf-leaf {
+  position: absolute;
+  width: 14px;
+  height: 22px;
+  border-radius: 0 70% 0 70%;
+  background: var(--green-mid);
+  opacity: 0.55;
+  animation: nf-fall 11s linear infinite;
+}
+.nf-leaf-1 { left: 12%; top: -10%; animation-delay: 0s; }
+.nf-leaf-2 {
+  left: 55%;
+  top: -10%;
+  width: 11px;
+  height: 18px;
+  background: var(--teal);
+  animation-delay: 3.5s;
+  animation-duration: 14s;
+}
+.nf-leaf-3 {
+  left: 78%;
+  top: -10%;
+  width: 12px;
+  height: 20px;
+  background: color-mix(in srgb, var(--green) 70%, var(--amber));
+  animation-delay: 7s;
+  animation-duration: 12s;
+}
+
+.nf-content {
+  position: relative;
+  z-index: 2;
+  max-width: 34rem;
+  text-align: center;
+}
+
+.nf-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--green);
+  margin-bottom: 1.25rem;
+}
+
+.nf-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  color: var(--green);
+}
+
+.nf-digit {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(4.5rem, 14vw, 7rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--green);
+  text-shadow: 0 8px 28px color-mix(in srgb, var(--green) 22%, transparent);
+}
+
+.nf-compass {
+  display: inline-flex;
+  color: var(--green);
+  animation: nf-sway 5s ease-in-out infinite;
+}
+
+.nf-needle {
+  transform-origin: 32px 32px;
+  animation: nf-spin-needle 8s ease-in-out infinite;
+}
+
+.nf-title {
+  font-size: clamp(1.75rem, 5vw, 2.45rem);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+.nf-title em {
+  font-style: italic;
+  color: var(--teal);
+}
+
+.nf-lead {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+}
+
+.nf-trail {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1.75rem;
+}
+.nf-trail span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--amber) 75%, var(--green));
+  opacity: 0.35;
+  animation: nf-trail-pulse 1.8s ease-in-out infinite;
+}
+.nf-trail span:nth-child(2) { animation-delay: 0.2s; }
+.nf-trail span:nth-child(3) { animation-delay: 0.4s; }
+.nf-trail span:nth-child(4) { animation-delay: 0.6s; }
+.nf-trail span:nth-child(5) { animation-delay: 0.8s; }
+
+.nf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.nf-btn-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nf-tip {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 28rem;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+.nf-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 160px;
+  z-index: 1;
+  pointer-events: none;
+}
+.nf-hills {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.nf-hill-back { fill: color-mix(in srgb, var(--green) 28%, var(--surface)); }
+.nf-hill-front { fill: color-mix(in srgb, var(--green) 48%, var(--teal)); opacity: 0.85; }
+
+@keyframes nf-drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(40vw); }
+}
+
+@keyframes nf-fall {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+    opacity: 0;
+  }
+  10% { opacity: 0.55; }
+  100% {
+    transform: translateY(110vh) rotate(340deg) translateX(40px);
+    opacity: 0;
+  }
+}
+
+@keyframes nf-sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(8deg); }
+}
+
+@keyframes nf-spin-needle {
+  0%, 100% { transform: rotate(-18deg); }
+  40% { transform: rotate(42deg); }
+  70% { transform: rotate(-8deg); }
+}
+
+@keyframes nf-trail-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 0.95; transform: scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-cloud,
+  .nf-leaf,
+  .nf-compass,
+  .nf-needle,
+  .nf-trail span {
+    animation: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .nf-page { padding-bottom: 6.5rem; }
+  .nf-actions { flex-direction: column; align-items: stretch; }
+  .nf-actions .btn { width: 100%; justify-content: center; }
+}

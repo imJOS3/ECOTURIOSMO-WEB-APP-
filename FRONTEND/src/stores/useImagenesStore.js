@@ -6,6 +6,13 @@ const entityKey = (entityType, id) => `${entityType}:${id}`;
 const getErrorMessage = (error) =>
   error?.response?.data?.message || error?.message || "Ocurrió un error";
 
+const normalizeUploadItems = (filesOrItems) =>
+  (filesOrItems || []).map((item) =>
+    item?.file
+      ? { file: item.file, espacio: item.espacio }
+      : { file: item, espacio: item?.espacio }
+  );
+
 export const useImagenesStore = create((set) => ({
   byEntity: {},
   loadingByEntity: {},
@@ -47,8 +54,9 @@ export const useImagenesStore = create((set) => ({
     }
   },
 
-  uploadImagenes: async ({ entityType, id, files }) => {
+  uploadImagenes: async ({ entityType, id, files, items }) => {
     const key = entityKey(entityType, id);
+    const payload = normalizeUploadItems(items || files);
 
     set((state) => ({
       loadingByEntity: { ...state.loadingByEntity, [key]: true },
@@ -60,13 +68,11 @@ export const useImagenesStore = create((set) => ({
         throw new Error("Solo se admiten imágenes de alojamiento");
       }
 
-      const data = await imagenesService.uploadAlojamiento(id, files);
+      const responses = await imagenesService.uploadAlojamiento(id, payload);
 
-      const newItems = Array.isArray(data?.data)
-        ? data.data
-        : data?.data
-          ? [data.data]
-          : [];
+      const newItems = (responses || [])
+        .map((res) => res?.data)
+        .filter(Boolean);
 
       set((state) => ({
         byEntity: {
@@ -76,7 +82,7 @@ export const useImagenesStore = create((set) => ({
         loadingByEntity: { ...state.loadingByEntity, [key]: false },
       }));
 
-      return data;
+      return newItems;
     } catch (error) {
       set((state) => ({
         loadingByEntity: { ...state.loadingByEntity, [key]: false },
@@ -84,6 +90,30 @@ export const useImagenesStore = create((set) => ({
       }));
       throw error;
     }
+  },
+
+  updateImagenEspacio: async ({ entityType, entityId, imageId, espacio }) => {
+    const key = entityKey(entityType, entityId);
+
+    if (entityType !== "alojamiento") {
+      throw new Error("Solo se admiten imágenes de alojamiento");
+    }
+
+    const data = await imagenesService.updateEspacio(imageId, espacio);
+    const updated = data?.data || data;
+
+    set((state) => ({
+      byEntity: {
+        ...state.byEntity,
+        [key]: (state.byEntity[key] || []).map((image) =>
+          `${image.id}` === `${imageId}`
+            ? { ...image, ...updated, espacio }
+            : image
+        ),
+      },
+    }));
+
+    return updated;
   },
 
   deleteImagen: async ({ entityType, entityId, imageId }) => {

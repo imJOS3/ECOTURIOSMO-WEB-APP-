@@ -1,48 +1,37 @@
 import * as service from './alojamiento-imagen.service.js';
-
+import { DEFAULT_ESPACIO } from './alojamiento-imagen.queries.js';
 
 // =========================
 // CREAR
 // =========================
 
-export const create = async (
-  req,
-  res,
-  next
-) => {
-
+export const create = async (req, res, next) => {
   try {
-
     if (!req.file) {
-
       return res.status(400).json({
         success: false,
-        message: 'Imagen requerida'
+        message: 'Imagen requerida',
       });
     }
 
     const data = await service.create({
-
       id_alojamiento: req.body.id_alojamiento,
-
       url: req.file.path,
-
-      public_id: req.file.filename
+      public_id: req.file.filename,
+      espacio: req.body.espacio || DEFAULT_ESPACIO,
     });
 
     res.status(201).json({
       success: true,
-      data
+      data,
     });
-
   } catch (err) {
-
     next(err);
   }
 };
 
 // =========================
-// ACTUALIZAR
+// ACTUALIZAR ARCHIVO
 // =========================
 
 export const update = async (req, res, next) => {
@@ -50,90 +39,92 @@ export const update = async (req, res, next) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'Imagen requerida'
+        message: 'Imagen requerida',
       });
     }
 
     const data = await service.update(req.params.id, {
       url: req.file.path,
-      public_id: req.file.filename
+      public_id: req.file.filename,
     });
 
     if (!data) {
       return res.status(404).json({
         success: false,
-        message: 'Imagen no encontrada'
+        message: 'Imagen no encontrada',
       });
     }
 
     res.status(200).json({
       success: true,
-      data
+      data,
     });
-
   } catch (err) {
     next(err);
   }
 };
+
+// =========================
+// ACTUALIZAR ESPACIO
+// =========================
+
+export const updateEspacio = async (req, res, next) => {
+  try {
+    const data = await service.updateEspacio(req.params.id, req.body.espacio);
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: 'Imagen no encontrada',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // =========================
 // OBTENER POR ALOJAMIENTO
 // =========================
 
-export const getByAlojamiento = async (
-  req,
-  res,
-  next
-) => {
-
+export const getByAlojamiento = async (req, res, next) => {
   try {
-
-    const data = await service.getByAlojamiento(
-      req.params.id_alojamiento
-    );
+    const data = await service.getByAlojamiento(req.params.id_alojamiento);
 
     res.status(200).json({
       success: true,
-      data
+      data,
     });
-
   } catch (err) {
-
     next(err);
   }
 };
-
 
 // =========================
 // ELIMINAR
 // =========================
 
-export const remove = async (
-  req,
-  res,
-  next
-) => {
-
+export const remove = async (req, res, next) => {
   try {
-
-    const data = await service.remove(
-      req.params.id
-    );
+    const data = await service.remove(req.params.id);
 
     if (!data) {
-
       return res.status(404).json({
         success: false,
-        message: 'Imagen no encontrada'
+        message: 'Imagen no encontrada',
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Imagen eliminada'
+      message: 'Imagen eliminada',
     });
-
   } catch (err) {
-
     next(err);
   }
 };

@@ -7,6 +7,7 @@ import usePagosStore from "../../stores/usePagosStore";
 import useUsuariosStore from "../../stores/useUsuariosStore";
 import { useCategoriasStore } from "../../stores/useCategoriasStore";
 import { Badge, Spinner, EmptyState } from "../../components/common/ui/index";
+import UserAvatar from "../../components/common/UserAvatar";
 import AlojamientosGrid from "../../components/panels/AlojamientosGrid";
 import { TabModeracion, TabModeracionLog } from "../../components/panels/TabModeracion";
 import { TabReservasAnfitrion } from "../../components/panels/TabAnfitrion";
@@ -112,7 +113,7 @@ const PagePanel = ({ user }) => {
     <div>
       {/* Profile Card */}
       <div className="profile-card">
-        <div className="avatar">{user.nombre?.[0]?.toUpperCase()}</div>
+        <UserAvatar user={user} />
         <div>
           <p style={{ fontWeight: 500, fontSize: "1rem" }}>{user.nombre}</p>
           <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>{user.email}</p>

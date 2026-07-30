@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { Badge, Spinner } from "../../components/common/ui/index";
+import UserAvatar from "../../components/common/UserAvatar";
 import { PANEL_TAB_REGISTRY } from "../../routes/PanelRoutes";
 
 /**
@@ -20,7 +21,7 @@ const PanelLayout = ({ user }) => {
   return (
     <div>
       <div className="profile-card">
-        <div className="avatar">{user.nombre?.[0]?.toUpperCase()}</div>
+        <UserAvatar user={user} />
         <div>
           <p style={{ fontWeight: 500, fontSize: "1rem" }}>{user.nombre}</p>
           <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>{user.email}</p>

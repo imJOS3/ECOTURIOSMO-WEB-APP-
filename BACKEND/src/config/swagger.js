@@ -71,7 +71,11 @@ API REST para la plataforma de ecoturismo (alojamientos, reservas, pagos, reseñ
           id: { type: 'integer', example: 1 },
           nombre: { type: 'string', example: 'Ana Pérez' },
           email: { type: 'string', format: 'email', example: 'ana@mail.com' },
-          rol: { type: 'string', enum: ['turista', 'anfitrion', 'admin'] }
+          rol: { type: 'string', enum: ['turista', 'anfitrion', 'admin'] },
+          telefono: { type: 'string', example: '+573001112233' },
+          fecha_nacimiento: { type: 'string', format: 'date', example: '1995-04-12' },
+          ciudad: { type: 'string', example: 'Medellín' },
+          avatar_url: { type: 'string', nullable: true }
         }
       },
       AuthLoginRequest: {
@@ -84,11 +88,23 @@ API REST para la plataforma de ecoturismo (alojamientos, reservas, pagos, reseñ
       },
       AuthRegisterRequest: {
         type: 'object',
-        required: ['nombre', 'email', 'password'],
+        required: [
+          'nombre',
+          'email',
+          'password',
+          'telefono',
+          'fecha_nacimiento',
+          'ciudad',
+          'acepta_terminos'
+        ],
         properties: {
-          nombre: { type: 'string' },
+          nombre: { type: 'string', example: 'Ana Pérez' },
           email: { type: 'string', format: 'email' },
           password: { type: 'string', format: 'password', minLength: 8 },
+          telefono: { type: 'string', example: '+573001112233' },
+          fecha_nacimiento: { type: 'string', format: 'date', example: '1995-04-12' },
+          ciudad: { type: 'string', example: 'Medellín' },
+          acepta_terminos: { type: 'boolean', example: true },
           rol: { type: 'string', enum: ['turista', 'anfitrion'], default: 'turista' }
         }
       },
