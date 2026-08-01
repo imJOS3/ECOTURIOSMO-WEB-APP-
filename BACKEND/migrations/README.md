@@ -56,3 +56,12 @@ node migrations/run-007.js
 ```
 
 API: campo `espacio` en `POST /api/alojamiento-imagen`; `PATCH /api/alojamiento-imagen/:id/espacio`
+
+## `008_usuario_google_auth.sql`
+Login con Google: `auth_provider`, `google_id`; `password_hash` puede ser NULL.
+
+```bash
+node migrations/run-008.js
+```
+
+API: `POST /api/auth/google` body `{ "credential": "<JWT de Google>", "rol": "turista" }`

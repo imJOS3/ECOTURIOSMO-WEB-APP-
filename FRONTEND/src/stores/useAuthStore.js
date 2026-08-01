@@ -3,6 +3,13 @@ import { apiFetch, getUser } from "../utils/api";
 
 const initialUser = getUser() || null;
 
+const persistSession = (data, set) => {
+  if (data?.token) localStorage.setItem("eco_token", data.token);
+  if (data?.user) localStorage.setItem("eco_user", JSON.stringify(data.user));
+  set({ user: data.user || null });
+  return data.user;
+};
+
 const useAuthStore = create((set, get) => ({
   user: initialUser,
   loading: false,
@@ -13,14 +20,33 @@ const useAuthStore = create((set, get) => ({
   login: async (email, password) => {
     set({ loading: true, error: null });
     try {
-      const data = await apiFetch("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
-      // expect { token, user }
-      if (data?.token) localStorage.setItem("eco_token", data.token);
-      if (data?.user) localStorage.setItem("eco_user", JSON.stringify(data.user));
-      set({ user: data.user || null });
-      return data.user;
-    } catch (e) { set({ error: e.message }); throw e; }
-    finally { set({ loading: false }); }
+      const data = await apiFetch("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      return persistSession(data, set);
+    } catch (e) {
+      set({ error: e.message });
+      throw e;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  loginWithGoogle: async (credential, rol = "turista") => {
+    set({ loading: true, error: null });
+    try {
+      const data = await apiFetch("/auth/google", {
+        method: "POST",
+        body: JSON.stringify({ credential, rol }),
+      });
+      return persistSession(data, set);
+    } catch (e) {
+      set({ error: e.message });
+      throw e;
+    } finally {
+      set({ loading: false });
+    }
   },
 
   logout: () => {
@@ -32,21 +58,35 @@ const useAuthStore = create((set, get) => ({
   register: async (payload) => {
     set({ loading: true, error: null });
     try {
-      const data = await apiFetch("/auth/register", { method: "POST", body: JSON.stringify(payload) });
+      const data = await apiFetch("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
       return data;
-    } catch (e) { set({ error: e.message }); throw e; }
-    finally { set({ loading: false }); }
+    } catch (e) {
+      set({ error: e.message });
+      throw e;
+    } finally {
+      set({ loading: false });
+    }
   },
 
   fetchProfile: async () => {
     set({ loading: true, error: null });
     try {
       const user = await apiFetch("/auth/me");
-      if (user) { localStorage.setItem("eco_user", JSON.stringify(user)); set({ user }); }
+      if (user) {
+        localStorage.setItem("eco_user", JSON.stringify(user));
+        set({ user });
+      }
       return user;
-    } catch (e) { set({ error: e.message }); throw e; }
-    finally { set({ loading: false }); }
-  }
+    } catch (e) {
+      set({ error: e.message });
+      throw e;
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
 
 export default useAuthStore;

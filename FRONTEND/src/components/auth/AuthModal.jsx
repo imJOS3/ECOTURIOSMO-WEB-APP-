@@ -8,6 +8,10 @@ import {
   GoogleGlyph,
   MicrosoftGlyph,
 } from "./socialIcons";
+import {
+  isGoogleAuthConfigured,
+  requestGoogleCredential,
+} from "../../utils/googleAuth";
 
 const SOCIAL_PROVIDERS = [
   {
@@ -118,18 +122,40 @@ const AuthModal = ({ mode: initialMode, onClose, onAuth }) => {
 
   const login = useAuthStore((s) => s.login);
   const register = useAuthStore((s) => s.register);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
 
-  const handleSocial = (providerId) => {
+  const handleSocial = async (providerId) => {
     setError("");
+    setInfo("");
+
+    if (providerId === "google") {
+      if (!isGoogleAuthConfigured()) {
+        setError(
+          "Google aún no está configurado. Agrega VITE_GOOGLE_CLIENT_ID en el frontend y GOOGLE_CLIENT_ID en el backend."
+        );
+        return;
+      }
+      setLoading(true);
+      try {
+        const credential = await requestGoogleCredential();
+        const user = await loginWithGoogle(credential, form.rol || "turista");
+        onAuth?.(user);
+      } catch (e) {
+        setError(e.message || "No se pudo iniciar sesión con Google.");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     const names = {
-      google: "Google",
       apple: "Apple",
       microsoft: "Hotmail / Outlook (Microsoft)",
       facebook: "Facebook",
     };
     setInfo(
-      `El acceso con ${names[providerId] || providerId} está preparado en la interfaz. ` +
-        "Para activarlo hay que crear la app en el panel del proveedor y conectar OAuth en el backend."
+      `El acceso con ${names[providerId] || providerId} estará disponible pronto. ` +
+        "Por ahora puedes usar Google o tu correo."
     );
   };
 
@@ -181,7 +207,7 @@ const AuthModal = ({ mode: initialMode, onClose, onAuth }) => {
             <h2 className="modal-title display">{mode === "login" ? "Bienvenido" : "Únete"}</h2>
             <p className="modal-subtitle">
               {mode === "login"
-                ? "Ingresa con una red social o con tu correo"
+                ? "Ingresa con tu correo o con una red social"
                 : "Completa tus datos básicos para una cuenta más segura"}
             </p>
           </div>
@@ -213,25 +239,6 @@ const AuthModal = ({ mode: initialMode, onClose, onAuth }) => {
           >
             Registrarse
           </button>
-        </div>
-
-        <div className="social-auth-grid">
-          {SOCIAL_PROVIDERS.map(({ id, label, Icon, className }) => (
-            <button
-              key={id}
-              type="button"
-              className={className}
-              onClick={() => handleSocial(id)}
-              disabled={loading}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="auth-divider" role="separator">
-          <span>o con correo electrónico</span>
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}
@@ -386,6 +393,25 @@ const AuthModal = ({ mode: initialMode, onClose, onAuth }) => {
         >
           {loading ? "Cargando..." : mode === "login" ? "Ingresar" : "Crear cuenta"}
         </button>
+
+        <div className="auth-divider" role="separator">
+          <span>o continúa con</span>
+        </div>
+
+        <div className="social-auth-grid">
+          {SOCIAL_PROVIDERS.map(({ id, label, Icon, className }) => (
+            <button
+              key={id}
+              type="button"
+              className={className}
+              onClick={() => handleSocial(id)}
+              disabled={loading}
+            >
+              <Icon size={18} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

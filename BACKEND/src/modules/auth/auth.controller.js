@@ -1,4 +1,4 @@
-  import * as authService from './auth.service.js';
+import * as authService from './auth.service.js';
 
 export const register = async (req, res, next) => {
   try {
@@ -12,6 +12,15 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const data = await authService.login(req.body);
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const google = async (req, res, next) => {
+  try {
+    const data = await authService.loginWithGoogle(req.body);
     res.json(data);
   } catch (err) {
     next(err);
